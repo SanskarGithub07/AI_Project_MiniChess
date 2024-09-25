@@ -31,7 +31,7 @@ For more information about Pygame and its functions, refer to the official Pygam
 ## Next Steps
 
 This project currently only renders the chessboard. Future improvements could include:
-- Adding chess pieces
+- Adding functionality to chess pieces
 - Implementing game logic
 - Creating a user interface for moves
 
