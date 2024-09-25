@@ -12,7 +12,7 @@ class ChessBoard:
         self.dark_color = (181, 136, 99)
         
         # Load the chess pieces image
-        self.pieces_image = pygame.image.load('ChessPiecesArray.png').convert_alpha()
+        self.pieces_image = pygame.image.load('Pieces/ChessPiecesArray.png').convert_alpha()
         self.piece_size = self.pieces_image.get_height() // 2
 
         # Define the piece positions in the image
