@@ -107,6 +107,13 @@ class ChessBoard:
             return True
         return False
     
+    def is_empty_square(self, row, col):
+        return self.get_piece_at((row, col)) is None
+
+    def is_opponent_piece(self, row, col, current_color):
+        piece = self.get_piece_at((row, col))
+        return piece is not None and piece.color != current_color
+    
     def draw_possible_moves(self, piece):
         if piece:
             possible_moves = piece.get_possible_moves(self)
