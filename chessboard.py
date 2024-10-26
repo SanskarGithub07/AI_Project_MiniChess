@@ -93,7 +93,7 @@ class ChessBoard:
                     (piece.color == 'black' and piece.position[0] == 1)):
                     x = self.board_offset_x + piece.position[1] * self.tile_size
                     y = self.board_offset_y + piece.position[0] * self.tile_size
-                    pygame.draw.rect(self.screen, (255, 215, 0), 
+                    pygame.draw.rect(self.screen, (255, 0, 0), 
                                 (x, y, self.tile_size, self.tile_size), 2)
 
     def get_piece_at(self, position):
@@ -103,7 +103,7 @@ class ChessBoard:
         return None
 
     def move_piece(self, piece, new_position):
-        if piece.move(new_position, self):
+        if piece and piece.move(new_position, self):
             return True
         return False
     
