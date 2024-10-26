@@ -6,15 +6,26 @@ class Piece:
         self.image = image
         self.color = color
         self.position = position
+        self.type = self.__class__.__name__.lower()
 
     def draw(self, tile_size, board_offset_x, board_offset_y):
         x = board_offset_x + self.position[1] * tile_size
         y = board_offset_y + self.position[0] * tile_size
         self.screen.blit(self.image, (x, y))
-
+    
     # def move(self, new_position, board):
     #     if self.is_valid_move(new_position, board):
+    #         target_piece = board.get_piece_at(new_position)
+    #         if target_piece:
+    #             board.pieces.remove(target_piece)
+                
     #         self.position = new_position
+    #         self.moved_once = True
+            
+    #         # if (self.color == 'white' and new_position[0] == 7) or \
+    #         #    (self.color == 'black' and new_position[0] == 0):
+    #         #     self.promote(board)
+            
     #         return True
     #     return False
     
@@ -23,121 +34,170 @@ class Piece:
             target_piece = board.get_piece_at(new_position)
             if target_piece:
                 board.pieces.remove(target_piece)
-                
+
             self.position = new_position
             self.moved_once = True
-            
-            # if (self.color == 'white' and new_position[0] == 7) or \
-            #    (self.color == 'black' and new_position[0] == 0):
-            #     self.promote(board)
-            
+
+            if isinstance(self, Pawn):  ## Check if the piece is a pawn
+                self.check_promotion(new_position, board)   
+
             return True
         return False
+
+    ## Only for the pawn -> queen change
+    def check_promotion(self, new_position, board):
+        if (self.color == 'white' and new_position[0] == 7) or \
+        (self.color == 'black' and new_position[0] == 0):
+            self.promote(board)
     
     def is_valid_move(self, new_position, board):
         if new_position not in self.get_possible_moves(board):
             return False
         return True
+    
+    def get_possible_moves(self, board):
+        possible_moves = []
+        current_row, current_col = self.position
+
+        # Define the movement patterns for different piece types
+        movement_patterns = {
+            'rook': [(-1, 0), (1, 0), (0, -1), (0, 1)],
+            'knight': [(-2, 1), (-1, 2), (1, 2), (2, 1), (2, -1), (1, -2), (-1, -2), (-2, -1)],
+            'bishop': [(-1, -1), (-1, 1), (1, -1), (1, 1)],
+            'queen': [(-1, -1), (-1, 1), (1, -1), (1, 1), (0, 1), (1, 0), (-1, 0), (0, -1)],
+            'king': [(-1, -1), (-1, 1), (1, -1), (1, 1), (0, 1), (1, 0), (-1, 0), (0, -1)],
+            'pawn': [(1, 0)]
+        }
+
+        for direction in movement_patterns[self.type]:
+            possible_moves.extend(self.get_moves_in_direction(board, current_row, current_col, direction))
+
+        return possible_moves
+    
+    def get_moves_in_direction(self, board, row, col, direction):
+        moves = []
+        row_increase, col_increase = direction
+        new_row, new_col = row + row_increase, col + col_increase
+
+        if self.type in ['rook', 'bishop', 'queen']:
+            while 0 <= new_row < 8 and 0 <= new_col < 8:
+                if board.is_empty_square(new_row, new_col) or board.is_opponent_piece(new_row, new_col, self.color):
+                    moves.append((new_row, new_col))
+                    if board.is_opponent_piece(new_row, new_col, self.color):
+                        break  # Stop checking after capturing
+                else:
+                    break  # Stop checking if blocked by a friendly piece
+
+                new_row += row_increase
+                new_col += col_increase
+        else:
+            # For knight and king, directly add move if valid
+            if 0 <= new_row < 8 and 0 <= new_col < 8:
+                if board.is_empty_square(new_row, new_col) or board.is_opponent_piece(new_row, new_col, self.color):
+                    moves.append((new_row, new_col))
+
+        return moves
 
 class Rook(Piece):
     def __init__(self, screen, image, color, position):
         super().__init__(screen, image, color, position)
 
-    def get_possible_moves(self, board):
-        possible_moves = []
-        current_row, current_col = self.position
+    # def get_possible_moves(self, board):
+    #     possible_moves = []
+    #     current_row, current_col = self.position
         
-        # Rook movement cardinal directions
-        directions = [
-            (-1, 0),
-            (1, 0),
-            (0, -1),
-            (0, 1)
-        ]
+    #     ## Rook movement cardinal directions
+    #     directions = [
+    #         (-1, 0),
+    #         (1, 0),
+    #         (0, -1),
+    #         (0, 1)
+    #     ]
         
-        for direction in directions:
-            row_increase, col_increase = direction
-            new_row = current_row + row_increase
-            new_col = current_col + col_increase
+    #     for direction in directions:
+    #         row_increase, col_increase = direction
+    #         new_row = current_row + row_increase
+    #         new_col = current_col + col_increase
             
-            while 0 <= new_row < 8 and 0 <= new_col < 8:
-                possible_moves.append((new_row, new_col))
-                new_row += row_increase
-                new_col += col_increase
+    #         while 0 <= new_row < 8 and 0 <= new_col < 8:
+    #             possible_moves.append((new_row, new_col))
+    #             new_row += row_increase
+    #             new_col += col_increase
                 
-        return possible_moves
+    #     return possible_moves
 
 class Knight(Piece):
     def __init__(self, screen, image, color, position):
         super().__init__(screen, image, color, position)
+    # pass
 
-    def get_possible_moves(self, board):
-        possible_moves = []
-        current_row, current_col = self.position
+    # def get_possible_moves(self, board):
+    #     possible_moves = []
+    #     current_row, current_col = self.position
         
-        # Knight movement - 8 directions
-        directions = [
-            (-2, -1),
-            (-2, 1),
-            (1, -2),
-            (1, 2),
-            (2, -1),
-            (2, 1),
-            (-1, -2),
-            (-1, 2)
-        ]
+    #     ## Knight movement - 8 directions
+    #     directions = [
+    #         (-2, -1),
+    #         (-2, 1),
+    #         (1, -2),
+    #         (1, 2),
+    #         (2, -1),
+    #         (2, 1),
+    #         (-1, -2),
+    #         (-1, 2)
+    #     ]
         
-        # Creates possible moves based on directions
-        for direction in directions:
-            row_increase, col_increase = direction
-            new_row = current_row + row_increase
-            new_col = current_col + col_increase
+    #     ## Creates possible moves based on directions
+    #     for direction in directions:
+    #         row_increase, col_increase = direction
+    #         new_row = current_row + row_increase
+    #         new_col = current_col + col_increase
             
-            # Clips it for 8x8 board and append
-            if 0 <= new_row < 8 and 0 <= new_col < 8:
-                possible_moves.append((new_row, new_col))
+    #         ## Clips it for 8x8 board and append
+    #         if 0 <= new_row < 8 and 0 <= new_col < 8:
+    #             possible_moves.append((new_row, new_col))
                 
-        return possible_moves
+    #     return possible_moves
 
 
 class Bishop(Piece):
     def __init__(self, screen, image, color, position):
         super().__init__(screen, image, color, position)
         
-    def get_possible_moves(self, board):
-        possible_moves = []
-        current_row, current_col = self.position
+    # def get_possible_moves(self, board):
+    #     possible_moves = []
+    #     current_row, current_col = self.position
         
-        # Bishop movement diagonal directions
-        directions = [
-            (-1, -1),
-            (-1, 1),
-            (1, -1),
-            (1, 1)
-        ]
+    #     ## Bishop movement diagonal directions
+    #     directions = [
+    #         (-1, -1),
+    #         (-1, 1),
+    #         (1, -1),
+    #         (1, 1)
+    #     ]
         
-        for direction in directions:
-            row_increase, col_increase = direction
-            new_row = current_row + row_increase
-            new_col = current_col + col_increase
+    #     for direction in directions:
+    #         row_increase, col_increase = direction
+    #         new_row = current_row + row_increase
+    #         new_col = current_col + col_increase
             
-            while 0 <= new_row < 8 and 0 <= new_col < 8:
-                target_piece = board.get_piece_at((new_row, new_col))
+    #         while 0 <= new_row < 8 and 0 <= new_col < 8:
+    #             target_piece = board.get_piece_at((new_row, new_col))
                 
-                if target_piece is None:
-                    possible_moves.append((new_row, new_col))
+    #             if target_piece is None:
+    #                 possible_moves.append((new_row, new_col))
                     
-                elif target_piece.color != self.color:
-                    possible_moves.append((new_row, new_col))
-                    break
+    #             elif target_piece.color != self.color:
+    #                 possible_moves.append((new_row, new_col))
+    #                 break
                 
-                else:
-                    break
+    #             else:
+    #                 break
                 
-                new_row += row_increase
-                new_col += col_increase
+    #             new_row += row_increase
+    #             new_col += col_increase
                 
-        return possible_moves
+    #     return possible_moves
 
     
 
@@ -145,67 +205,66 @@ class Queen(Piece):
     def __init__(self, screen, image, color, position):
         super().__init__(screen, image, color, position)
 
-    def get_possible_moves(self, board):
-        possible_moves = []
-        current_row, current_col = self.position
+    # def get_possible_moves(self, board):
+    #     possible_moves = []
+    #     current_row, current_col = self.position
         
-        directions = [
-            (-1, -1),
-            (-1, 1),
-            (1, -1),
-            (1, 1),
-            (0, 1),
-            (1, 0),
-            (-1, 0),
-            (0, -1)
-        ]
+    #     directions = [
+    #         (-1, -1),
+    #         (-1, 1),
+    #         (1, -1),
+    #         (1, 1),
+    #         (0, 1),
+    #         (1, 0),
+    #         (-1, 0),
+    #         (0, -1)
+    #     ]
         
-        for direction in directions:
-            row_increase, col_increase = direction
-            new_row = current_row + row_increase
-            new_col = current_col + col_increase
-            while 0 <= new_row < 8 and 0 <= new_col < 8:
-                possible_moves.append((new_row, new_col))
-                new_row += row_increase
-                new_col += col_increase
+    #     for direction in directions:
+    #         row_increase, col_increase = direction
+    #         new_row = current_row + row_increase
+    #         new_col = current_col + col_increase
+    #         while 0 <= new_row < 8 and 0 <= new_col < 8:
+    #             possible_moves.append((new_row, new_col))
+    #             new_row += row_increase
+    #             new_col += col_increase
             
-            # # Clips it for 8x8 board and append
-            # if 0 <= new_row < 8 and 0 <= new_col < 8:
-            #     possible_moves.append((new_row, new_col))
+    #         # # Clips it for 8x8 board and append
+    #         # if 0 <= new_row < 8 and 0 <= new_col < 8:
+    #         #     possible_moves.append((new_row, new_col))
                 
-        return possible_moves
+    #     return possible_moves
 
 class King(Piece):
     def __init__(self, screen, image, color, position):
         super().__init__(screen, image, color, position)
         
-    def get_possible_moves(self, board):
-        possible_moves = []
-        current_row, current_col = self.position
+    # def get_possible_moves(self, board):
+    #     possible_moves = []
+    #     current_row, current_col = self.position
         
-        directions = [
-            (-1, -1),
-            (-1, 1),
-            (1, -1),
-            (1, 1),
-            (0, 1),
-            (1, 0),
-            (-1, 0),
-            (0, -1)
-        ]
+    #     directions = [
+    #         (-1, -1),
+    #         (-1, 1),
+    #         (1, -1),
+    #         (1, 1),
+    #         (0, 1),
+    #         (1, 0),
+    #         (-1, 0),
+    #         (0, -1)
+    #     ]
         
-        for direction in directions:
-            row_increase, col_increase = direction
-            new_row = current_row + row_increase
-            new_col = current_col + col_increase
+    #     for direction in directions:
+    #         row_increase, col_increase = direction
+    #         new_row = current_row + row_increase
+    #         new_col = current_col + col_increase
             
-            # Clips it for 8x8 board and append
-            if 0 <= new_row < 8 and 0 <= new_col < 8:
-                possible_moves.append((new_row, new_col))
+    #         # Clips it for 8x8 board and append
+    #         if 0 <= new_row < 8 and 0 <= new_col < 8:
+    #             possible_moves.append((new_row, new_col))
                 
-        return possible_moves
+    #     return possible_moves
     
-
         
 
 class Pawn(Piece):
@@ -217,14 +276,13 @@ class Pawn(Piece):
     def get_possible_moves(self, board):
         possible_moves = []
         current_row, current_col = self.position
-        
         new_row = current_row + self.direction
-        
         if 0 <= new_row < 8:
             
             if not board.get_piece_at((new_row, current_col)):
                 possible_moves.append((new_row, current_col))
                 
+                ## En passant by checking if the pawn has moved once using boolean flag
                 if not self.moved_once:
                     second_row_ahead =  current_row + (2 * self.direction)               
                     if (0 <= second_row_ahead < 8 and not board.get_piece_at((second_row_ahead, current_col))):
@@ -246,21 +304,21 @@ class Pawn(Piece):
                     
         return possible_moves
     
-    def move(self, new_position, board):
-        if self.is_valid_move(new_position, board):
-            target_piece = board.get_piece_at(new_position)
-            if target_piece:
-                board.pieces.remove(target_piece)
+    # def move(self, new_position, board):
+    #     if self.is_valid_move(new_position, board):
+    #         target_piece = board.get_piece_at(new_position)
+    #         if target_piece:
+    #             board.pieces.remove(target_piece)
                 
-            self.position = new_position
-            self.moved_once = True
+    #         self.position = new_position
+    #         self.moved_once = True
             
-            if (self.color == 'white' and new_position[0] == 7) or \
-               (self.color == 'black' and new_position[0] == 0):
-                self.promote(board)
+    #         if (self.color == 'white' and new_position[0] == 7) or \
+    #            (self.color == 'black' and new_position[0] == 0):
+    #             self.promote(board)
             
-            return True
-        return False
+    #         return True
+    #     return False
     
     def promote(self, board):
         board.pieces.remove(self)
