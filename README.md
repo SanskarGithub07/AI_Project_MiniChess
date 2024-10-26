@@ -36,4 +36,3 @@ This project currently only renders the chessboard. Future improvements could in
 - Creating a user interface for moves
 
 Feel free to contribute to this project and expand its functionality!
-TEST
