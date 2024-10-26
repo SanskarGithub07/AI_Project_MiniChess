@@ -32,11 +32,15 @@ while running:
         elif event.type == pygame.MOUSEMOTION:
             if selected_piece:
                 new_position = chess_board.handle_click(pygame.mouse.get_pos())
-                chess_board.move_piece(selected_piece, new_position)
+                # chess_board.move_piece(selected_piece, new_position)
+                ## above thing breaks drag and drop as the movements are all updated too, 
+                ## thereby making the pieces move anywhere they want rather than just from initial position
       
 	# everything below is outside of movement event loop and runs under while
     screen.fill((255, 255, 255))
     chess_board.construct_board()
+    if selected_piece:
+        chess_board.draw_possible_moves(selected_piece)
     chess_board.draw_pieces()
     
     pygame.display.flip()
