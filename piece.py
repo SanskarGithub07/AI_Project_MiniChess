@@ -12,12 +12,44 @@ class Piece:
         y = board_offset_y + self.position[0] * tile_size
         self.screen.blit(self.image, (x, y))
 
-    def move(self, new_position):
-        self.position = new_position
+    def move(self, new_position, board):
+        if self.is_valid_move(new_position, board):
+            self.position = new_position
+            return True
+        return False
+    
+    def is_valid_move(self, new_position, board):
+        if new_position not in self.get_possible_moves(board):
+            return False
+        return True
 
 class Rook(Piece):
     def __init__(self, screen, image, color, position):
         super().__init__(screen, image, color, position)
+
+    def get_possible_moves(self, board):
+        possible_moves = []
+        current_row, current_col = self.position
+        
+        # Rook movement cardinal directions
+        directions = [
+            (-1, 0),
+            (1, 0),
+            (0, -1),
+            (0, 1)
+        ]
+        
+        for direction in directions:
+            row_increase, col_increase = direction
+            new_row = current_row + row_increase
+            new_col = current_col + col_increase
+            
+            while 0 <= new_row < 8 and 0 <= new_col < 8:
+                possible_moves.append((new_row, new_col))
+                new_row += row_increase
+                new_col += col_increase
+                
+        return possible_moves
 
 class Knight(Piece):
     def __init__(self, screen, image, color, position):
@@ -51,20 +83,6 @@ class Knight(Piece):
                 
         return possible_moves
 
-    def is_valid_move(self, new_position, board):
-        if new_position not in self.get_possible_moves(board):
-            return False
-        return True
-    
-    def move(self, new_position, board):
-        if self.is_valid_move(new_position, board):
-            # target_piece = board.get_piece_at(new_position, board)
-            # if target_piece:
-            #     board.pieces.remove(target_piece)
-            
-            self.position = new_position
-            return True
-        return False
 
 class Bishop(Piece):
     def __init__(self, screen, image, color, position):
@@ -105,20 +123,7 @@ class Bishop(Piece):
                 
         return possible_moves
 
-    def is_valid_move(self, new_position, board):
-        if new_position not in self.get_possible_moves(board):
-            return False
-        return True
     
-    def move(self, new_position, board):
-        if self.is_valid_move(new_position, board):
-            # target_piece = board.get_piece_at(new_position, board)
-            # if target_piece:
-            #     board.pieces.remove(target_piece)
-            
-            self.position = new_position
-            return True
-        return False
 
 class Queen(Piece):
     def __init__(self, screen, image, color, position):
@@ -208,8 +213,8 @@ class Pawn(Piece):
                     
         return possible_moves
     
-    def is_valid_move(self, new_position, board):
-        return new_position in self.get_possible_moves(board)
+    # def is_valid_move(self, new_position, board):
+    #     return new_position in self.get_possible_moves(board)
     
     def move(self, new_position, board):
         if self.is_valid_move(new_position, board):
