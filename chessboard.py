@@ -87,6 +87,14 @@ class ChessBoard:
     def draw_pieces(self):
         for piece in self.pieces:
             piece.draw(self.tile_size, self.board_offset_x, self.board_offset_y)
+            
+            if isinstance(piece, Pawn):
+                if ((piece.color == 'white' and piece.position[0] == 6) or 
+                    (piece.color == 'black' and piece.position[0] == 1)):
+                    x = self.board_offset_x + piece.position[1] * self.tile_size
+                    y = self.board_offset_y + piece.position[0] * self.tile_size
+                    pygame.draw.rect(self.screen, (255, 215, 0), 
+                                (x, y, self.tile_size, self.tile_size), 2)
 
     def get_piece_at(self, position):
         for piece in self.pieces:

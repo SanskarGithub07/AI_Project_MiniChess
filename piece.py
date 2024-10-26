@@ -88,5 +88,66 @@ class King(Piece):
 class Pawn(Piece):
     def __init__(self, screen, image, color, position):
         super().__init__(screen, image, color, position)
+        self.moved_once = False
+        self.direction = 1 if color == 'white' else -1
+            
+    def get_possible_moves(self, board):
+        possible_moves = []
+        current_row, current_col = self.position
         
+        new_row = current_row + self.direction
+        
+        if 0 <= new_row < 8:
+            
+            if not board.get_piece_at((new_row, current_col)):
+                possible_moves.append((new_row, current_col))
                 
+                if not self.moved_once:
+                    second_row_ahead =  current_row + (2 * self.direction)               
+                    if (0 <= second_row_ahead < 8 and not board.get_piece_at((second_row_ahead, current_col))):
+                        possible_moves.append((second_row_ahead, current_col)) 
+                        
+                        
+        capture_squares = [
+            (new_row, current_col - 1),
+            (new_row, current_col + 1)
+        ]        
+        
+        
+        for capture_square in capture_squares:
+            c_row, c_col = capture_square
+            if 0 <= c_row < 8 and 0 <= c_col < 8:
+                target_piece = board.get_piece_at((capture_square))
+                if target_piece and target_piece.color != self.color:
+                    possible_moves.append(capture_square)
+                    
+        return possible_moves
+    
+    def is_valid_move(self, new_position, board):
+        return new_position in self.get_possible_moves(board)
+    
+    def move(self, new_position, board):
+        if self.is_valid_move(new_position, board):
+            target_piece = board.get_piece_at(new_position)
+            if target_piece:
+                board.pieces.remove(target_piece)
+                
+            self.position = new_position
+            self.moved_once = True
+            
+            if (self.color == 'white' and new_position[0] == 7) or \
+               (self.color == 'black' and new_position[0] == 0):
+                self.promote(board)
+            
+            return True
+        return False
+    
+    def promote(self, board):
+        board.pieces.remove(self)
+        
+        queen_image = board.get_piece_image('queen', self.color)
+        new_queen = Queen(self.screen, queen_image, self.color, self.position)
+        board.pieces.append(new_queen)
+     
+                  
+    
