@@ -1,5 +1,5 @@
 import pygame
-from piece import Rook, Knight, Bishop, Queen, King, Pawn
+from piece2 import Rook, Knight, Bishop, Queen, King, Pawn
 
 class ChessBoard:
     def __init__(self, screen, width, height):
