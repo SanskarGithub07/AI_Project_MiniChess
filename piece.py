@@ -12,9 +12,25 @@ class Piece:
         y = board_offset_y + self.position[0] * tile_size
         self.screen.blit(self.image, (x, y))
 
+    # def move(self, new_position, board):
+    #     if self.is_valid_move(new_position, board):
+    #         self.position = new_position
+    #         return True
+    #     return False
+    
     def move(self, new_position, board):
         if self.is_valid_move(new_position, board):
+            target_piece = board.get_piece_at(new_position)
+            if target_piece:
+                board.pieces.remove(target_piece)
+                
             self.position = new_position
+            self.moved_once = True
+            
+            # if (self.color == 'white' and new_position[0] == 7) or \
+            #    (self.color == 'black' and new_position[0] == 0):
+            #     self.promote(board)
+            
             return True
         return False
     
@@ -108,15 +124,15 @@ class Bishop(Piece):
             while 0 <= new_row < 8 and 0 <= new_col < 8:
                 target_piece = board.get_piece_at((new_row, new_col))
                 
-                # if target_piece is None:
-                possible_moves.append((new_row, new_col))
+                if target_piece is None:
+                    possible_moves.append((new_row, new_col))
                     
-                # elif target_piece.color != self.color:
-                #     possible_moves.append((new_row, new_col))
-                #     break
+                elif target_piece.color != self.color:
+                    possible_moves.append((new_row, new_col))
+                    break
                 
-                # else:
-                #     break
+                else:
+                    break
                 
                 new_row += row_increase
                 new_col += col_increase
@@ -128,6 +144,36 @@ class Bishop(Piece):
 class Queen(Piece):
     def __init__(self, screen, image, color, position):
         super().__init__(screen, image, color, position)
+
+    def get_possible_moves(self, board):
+        possible_moves = []
+        current_row, current_col = self.position
+        
+        directions = [
+            (-1, -1),
+            (-1, 1),
+            (1, -1),
+            (1, 1),
+            (0, 1),
+            (1, 0),
+            (-1, 0),
+            (0, -1)
+        ]
+        
+        for direction in directions:
+            row_increase, col_increase = direction
+            new_row = current_row + row_increase
+            new_col = current_col + col_increase
+            while 0 <= new_row < 8 and 0 <= new_col < 8:
+                possible_moves.append((new_row, new_col))
+                new_row += row_increase
+                new_col += col_increase
+            
+            # # Clips it for 8x8 board and append
+            # if 0 <= new_row < 8 and 0 <= new_col < 8:
+            #     possible_moves.append((new_row, new_col))
+                
+        return possible_moves
 
 class King(Piece):
     def __init__(self, screen, image, color, position):
@@ -159,20 +205,7 @@ class King(Piece):
                 
         return possible_moves
     
-    def is_valid_move(self, new_position, board):
-        if new_position not in self.get_possible_moves(board):
-            return False
-        return True
-    
-    def move(self, new_position, board):
-        if self.is_valid_move(new_position, board):
-            # target_piece = board.get_piece_at(new_position, board)
-            # if target_piece:
-            #     board.pieces.remove(target_piece)
-            
-            self.position = new_position
-            return True
-        return False
+
         
 
 class Pawn(Piece):
@@ -212,9 +245,6 @@ class Pawn(Piece):
                     possible_moves.append(capture_square)
                     
         return possible_moves
-    
-    # def is_valid_move(self, new_position, board):
-    #     return new_position in self.get_possible_moves(board)
     
     def move(self, new_position, board):
         if self.is_valid_move(new_position, board):
