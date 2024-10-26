@@ -21,6 +21,7 @@ while running:
             position = pygame.mouse.get_pos()
             tile_position = chess_board.handle_click(position)
             piece = chess_board.get_piece_at(tile_position)
+<<<<<<< Updated upstream
             
             if selected_piece is None:
                 piece = chess_board.get_piece_at(tile_position)
@@ -32,6 +33,18 @@ while running:
                 else:
                     selected_piece = None
 
+=======
+            if piece:
+                selected_piece = piece
+                # indicates that this piece is ready to move
+            elif selected_piece:
+            	# attempts to move the selected piece to the clicked tile position
+                chess_board.move_piece(selected_piece, tile_position)
+                # reset the selection so nothing is selected
+                selected_piece = None
+                
+	# everything below is outside of the event loop and runs under while
+>>>>>>> Stashed changes
     screen.fill((255, 255, 255))
     chess_board.construct_board()
     if selected_piece:
