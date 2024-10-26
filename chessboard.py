@@ -95,7 +95,21 @@ class ChessBoard:
         return None
 
     def move_piece(self, piece, new_position):
-        piece.move(new_position)
+        if piece.move(new_position, self):
+            return True
+        return False
+    
+    def draw_possible_moves(self, piece):
+        if piece:
+            possible_moves = piece.get_possible_moves(self)
+            highlight_color = (124, 252, 0, 128)
+            surface = pygame.Surface((self.tile_size, self.tile_size), pygame.SRCALPHA)
+            pygame.draw.rect(surface, highlight_color, surface.get_rect())
+            
+            for move in possible_moves:
+                x = self.board_offset_x + move[1] * self.tile_size
+                y = self.board_offset_y + move[0] * self.tile_size
+                self.screen.blit(surface, (x, y))
 
     def handle_click(self, position):
         tile_x = (position[0] - self.board_offset_x) // self.tile_size

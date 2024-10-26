@@ -21,14 +21,21 @@ while running:
             position = pygame.mouse.get_pos()
             tile_position = chess_board.handle_click(position)
             piece = chess_board.get_piece_at(tile_position)
-            if piece:
-                selected_piece = piece
-            elif selected_piece:
-                chess_board.move_piece(selected_piece, tile_position)
-                selected_piece = None
+            
+            if selected_piece is None:
+                piece = chess_board.get_piece_at(tile_position)
+                if piece:
+                    selected_piece = piece
+            else:
+                if chess_board.move_piece(selected_piece, tile_position):
+                    selected_piece = None
+                else:
+                    selected_piece = None
 
     screen.fill((255, 255, 255))
     chess_board.construct_board()
+    if selected_piece:
+        chess_board.draw_possible_moves(selected_piece)
     chess_board.draw_pieces()
     
     pygame.display.flip()
