@@ -21,7 +21,6 @@ while running:
             position = pygame.mouse.get_pos()
             tile_position = chess_board.handle_click(position)
             piece = chess_board.get_piece_at(tile_position)
-            
             if selected_piece is None:
                 piece = chess_board.get_piece_at(tile_position)
                 if piece:

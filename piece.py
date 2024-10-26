@@ -23,6 +23,49 @@ class Knight(Piece):
     def __init__(self, screen, image, color, position):
         super().__init__(screen, image, color, position)
 
+    def get_possible_moves(self, board):
+        possible_moves = []
+        current_row, current_col = self.position
+        
+        # Knight movement - 8 directions
+        directions = [
+            (-2, -1),
+            (-2, 1),
+            (1, -2),
+            (1, 2),
+            (2, -1),
+            (2, 1),
+            (-1, -2),
+            (-1, 2)
+        ]
+        
+        # Creates possible moves based on directions
+        for direction in directions:
+            row_increase, col_increase = direction
+            new_row = current_row + row_increase
+            new_col = current_col + col_increase
+            
+            # Clips it for 8x8 board and append
+            if 0 <= new_row < 8 and 0 <= new_col < 8:
+                possible_moves.append((new_row, new_col))
+                
+        return possible_moves
+
+    def is_valid_move(self, new_position, board):
+        if new_position not in self.get_possible_moves(board):
+            return False
+        return True
+    
+    def move(self, new_position, board):
+        if self.is_valid_move(new_position, board):
+            # target_piece = board.get_piece_at(new_position, board)
+            # if target_piece:
+            #     board.pieces.remove(target_piece)
+            
+            self.position = new_position
+            return True
+        return False
+
 class Bishop(Piece):
     def __init__(self, screen, image, color, position):
         super().__init__(screen, image, color, position)
