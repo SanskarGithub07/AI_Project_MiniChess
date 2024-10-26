@@ -11,10 +11,21 @@ chess_board = ChessBoard(screen, width, height)
 
 clock = pygame.time.Clock()
 running = True
+selected_piece = None
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            position = pygame.mouse.get_pos()
+            tile_position = chess_board.handle_click(position)
+            piece = chess_board.get_piece_at(tile_position)
+            if piece:
+                selected_piece = piece
+            elif selected_piece:
+                chess_board.move_piece(selected_piece, tile_position)
+                selected_piece = None
 
     screen.fill((255, 255, 255))
     chess_board.construct_board()
