@@ -1,5 +1,3 @@
-#Main2 File
-
 import pygame
 import sys
 from chessboard import ChessBoard
