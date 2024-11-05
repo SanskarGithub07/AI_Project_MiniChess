@@ -126,7 +126,7 @@ class Pawn(Piece):
         for capture_square in capture_squares:
             c_row, c_col = capture_square
             if 0 <= c_row < 8 and 0 <= c_col < 8:
-                target_piece = board.get_piece_at((capture_square))
+                target_piece = board.get_piece_at(capture_square)
                 if target_piece and target_piece.color != self.color:
                     possible_moves.append(capture_square)
                     

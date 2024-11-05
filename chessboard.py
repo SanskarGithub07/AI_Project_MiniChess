@@ -129,4 +129,84 @@ class ChessBoard:
     def handle_click(self, position):
         tile_x = (position[0] - self.board_offset_x) // self.tile_size
         tile_y = (position[1] - self.board_offset_y) // self.tile_size
-        return (tile_y, tile_x)
+        if 0 <= tile_x < 8 and 0 <= tile_y < 8:
+            return (tile_y, tile_x)
+        return None
+    
+    def is_in_check(self, color):
+        king_position = None
+        for piece in self.pieces:
+            if piece.color == color and isinstance(piece, King):
+                king_position = piece.position
+                break
+
+        # Check if any opponent piece can move to king's position
+        for piece in self.pieces:
+            if piece.color != color:
+                if king_position in piece.get_possible_moves(self):
+                    return True
+        return False
+
+
+    def is_checkmate(self, color):
+        if not self.is_in_check(color):
+            return False
+
+        # Check if the player has any valid moves
+        for piece in self.pieces:
+            if piece.color == color:
+                for move in piece.get_possible_moves(self):
+                    # Simulate the move
+                    original_position = piece.position
+                    captured_piece = self.get_piece_at(move)
+
+                    piece.position = move
+                    if captured_piece:
+                        self.pieces.remove(captured_piece)
+
+                    # Check if the move resolves the check
+                    if not self.is_in_check(color):
+                        # Undo the move
+                        piece.position = original_position
+                        if captured_piece:
+                            self.pieces.append(captured_piece)
+                        return False
+
+                    # Undo the move
+                    piece.position = original_position
+                    if captured_piece:
+                        self.pieces.append(captured_piece)
+
+        # If the player has no valid moves, it's checkmate
+        return True
+    
+    def is_stalemate(self, color):
+        if self.is_in_check(color):
+            return False
+
+        for piece in self.pieces:
+            if piece.color == color:
+                for move in piece.get_possible_moves(self):
+                    # Simulate the move
+                    original_position = piece.position
+                    captured_piece = self.get_piece_at(move)
+
+                    piece.position = move
+                    if captured_piece:
+                        self.pieces.remove(captured_piece)
+
+                    # Check if it resolves stalemate
+                    if not self.is_in_check(color):
+                        piece.position = original_position
+                        if captured_piece:
+                            self.pieces.append(captured_piece)
+                        return False
+
+                    # Undo move
+                    piece.position = original_position
+                    if captured_piece:
+                        self.pieces.append(captured_piece)
+                        
+        return True
+
+    
