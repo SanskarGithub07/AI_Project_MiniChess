@@ -9,7 +9,10 @@ class GameRules:
         self.current_turn = 'black' if self.current_turn == 'white' else 'white'
 
     def is_in_check(self, color):
-        """Check if the current player's king is in check."""
+        """
+        Check if the player's king of the given color is in check.
+        This occurs if any opponent piece has a move that could capture the king.
+        """
         king = next((piece for piece in self.board.pieces if isinstance(piece, King) and piece.color == color), None)
         if not king:
             return False
@@ -43,7 +46,10 @@ class GameRules:
         return not in_check
 
     def is_checkmate(self, color):
-        """Check if the current player is in checkmate."""
+        """
+        Check if the player with the given color is in checkmate.
+        A player is in checkmate if they are in check and have no legal moves left.
+        """
         if not self.is_in_check(color):
             return False
 
@@ -56,7 +62,10 @@ class GameRules:
         return True
 
     def is_stalemate(self, color):
-        """Check for stalemate."""
+        """
+        Check if the game is in stalemate for the player of the given color.
+        Stalemate occurs if the player has no legal moves and is not in check.
+        """
         if self.is_in_check(color):
             return False
 
@@ -69,7 +78,10 @@ class GameRules:
         return True
 
     def is_game_over(self):
-        """Check if the game has ended with checkmate or stalemate."""
+        """
+        Check if the game has ended due to checkmate or stalemate.
+        Returns a message indicating the game result or None if the game is ongoing.
+        """
         if self.is_checkmate(self.current_turn):
             return f"Checkmate! {self.current_turn} loses."
         elif self.is_stalemate(self.current_turn):
