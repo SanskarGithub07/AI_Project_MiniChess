@@ -1,12 +1,14 @@
-#Main2 File
-
 import pygame
 import sys
 from chessboard import ChessBoard
 from game_rules import GameRules
-from sounds import SoundManager  # Import the SoundManager
+from sounds import SoundManager
 
+# Initialize pygame and sound manager
 pygame.init()
+sound_manager = SoundManager()
+
+# Screen setup
 board_width, board_height = 600, 600
 sidebar_width = 50  
 screen_width = board_width + sidebar_width
@@ -15,13 +17,15 @@ pygame.display.set_caption('Chess Board')
 
 chess_board = ChessBoard(screen, board_width, board_height)
 game_rules = GameRules(chess_board)
-sound_manager = SoundManager()  # Create an instance of SoundManager
 
 clock = pygame.time.Clock()
 running = True
 selected_piece = None
 dragging = False
 initial_position = None
+
+# Initialize font
+font = pygame.font.SysFont("Arial", 24, bold=True)
 
 def draw_turn_indicator():
     sidebar_color = (0, 0, 0) if game_rules.current_turn == 'black' else (255, 255, 255)
@@ -34,22 +38,46 @@ def draw_dragged_piece(piece, mouse_pos):
     y = mouse_pos[1] - offset_y
     screen.blit(piece.image, (x, y))
 
+def draw_game_status():
+    """Display check, checkmate, or stalemate messages on the screen."""
+    status_message = ""
+    if game_rules.is_in_check(game_rules.current_turn):
+        status_message = f"{game_rules.current_turn.capitalize()} is in Check!"
+    game_over = game_rules.is_game_over()
+    if game_over:
+        status_message = game_over
+
+    if status_message:
+        text_surface = font.render(status_message, True, (255, 0, 0))  # Red text for emphasis
+        screen.blit(text_surface, (10, 10))  # Position at top-left corner
+
 def handle_move(selected_piece, final_position):
-    if chess_board.move_piece(selected_piece, final_position):
+    if game_rules.is_move_legal(selected_piece, final_position) and chess_board.move_piece(selected_piece, final_position):
         if game_rules.is_in_check(game_rules.current_turn):
-            selected_piece.position = initial_position  # Revert move
-            return False
-        sound_manager.play_move_sound()  # Play move sound
-        game_rules.switch_turn()
+            print(f"{game_rules.current_turn.capitalize()} is in check.")
+            sound_manager.play_check_sound()  # Play check sound
+
         game_over = game_rules.is_game_over()
         if game_over:
             print(game_over)
+            # Play the checkmate sound for checkmate; otherwise, a regular move sound
+            if "Checkmate" in game_over:
+                sound_manager.play_checkmate_sound()
+            elif "Stalemate" in game_over:
+                sound_manager.play_move_sound()  # Stalemate as a regular move sound
+            else:
+                sound_manager.play_move_sound()
+
             pygame.time.delay(2000)  # Pause to display the game-over message
             pygame.quit()
             sys.exit()
+
+        else:
+            sound_manager.play_move_sound()  # Regular move sound if no game-ending state
+        game_rules.switch_turn()
         return True
     else:
-        selected_piece.position = initial_position  # Revert move
+        selected_piece.position = initial_position  # Revert move if invalid
         return False
 
 while running:
@@ -72,13 +100,7 @@ while running:
         elif event.type == pygame.MOUSEBUTTONUP:
             if selected_piece and dragging:
                 final_position = chess_board.handle_click(mouse_pos)
-                if handle_move(selected_piece, final_position):
-                    # Check for check or checkmate
-                    if game_rules.is_in_check(game_rules.current_turn):
-                        sound_manager.play_check_sound()
-                    elif game_rules.is_checkmate(game_rules.current_turn):
-                        sound_manager.play_checkmate_sound()
-
+                handle_move(selected_piece, final_position)
                 selected_piece = None
                 dragging = False
                 initial_position = None
@@ -107,6 +129,7 @@ while running:
         draw_dragged_piece(selected_piece, mouse_pos)
 
     draw_turn_indicator()
+    draw_game_status()  # Draw the game status message on the board
     pygame.display.flip()
     clock.tick(60)
 
