@@ -30,12 +30,12 @@ def main():
             run_game(screen, screen_width, board_height, sidebar_width, sound_manager)
         elif choice == 'Human_vs_AI':
             # To be implemented
-            run_game(screen, screen_width, board_height, sidebar_width, sound_manager, 'human_vs_ai')
-        elif choice == 'ai_vs_ai':
+            run_game(screen, screen_width, board_height, sidebar_width, sound_manager, 'Human_vs_AI')
+        elif choice == 'AI_vs_AI':
             # To be implemented
-            run_game(screen, screen_width, board_height, sidebar_width, sound_manager,'ai_vs_ai')
+            run_game(screen, screen_width, board_height, sidebar_width, sound_manager,'AI_vs_AI')
 
-def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, game_mode='human_vs_human'):
+def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, game_mode='Human_vs_Human'):
     board_width = screen_width - sidebar_width
     chess_board = ChessBoard(screen, board_width, board_height)
     game_rules = GameRules(chess_board)
@@ -44,7 +44,7 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
     
     # Initialize AI if needed
     ai = None
-    if game_mode in ['human_vs_ai', 'ai_vs_ai']:
+    if game_mode in ['Human_vs_AI', 'AI_vs_AI']:
         ai = ChessAI(chess_board, game_rules, depth=3)
     
     running = True
@@ -95,8 +95,8 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
         mouse_pos = pygame.mouse.get_pos()
         
         # Handle AI moves
-        if ((game_mode == 'human_vs_ai' and game_rules.current_turn == 'black') or 
-            (game_mode == 'ai_vs_ai')):
+        if ((game_mode == 'Human_vs_AI' and game_rules.current_turn == 'black') or 
+            (game_mode == 'AI_vs_AI')):
             
             best_move = ai.get_best_move(game_rules.current_turn)
             if best_move:
@@ -112,7 +112,7 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
                 running = False
             
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if game_mode == 'ai_vs_ai':
+                if game_mode == 'AI_vs_AI':
                     continue
                 # Check if menu icon is clicked
                 menu_action = game_menu.handle_click(mouse_pos)
