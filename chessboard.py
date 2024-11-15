@@ -179,3 +179,13 @@ class ChessBoard:
         tile_x = (position[0] - self.board_offset_x) // self.tile_size
         tile_y = (position[1] - self.board_offset_y) // self.tile_size
         return (tile_y, tile_x)
+    
+    def get_pieces_by_color(self, color):
+
+       return [piece for piece in self.pieces if piece.color == color]
+    
+    def find_king(self, color):
+      for piece in self.pieces:
+        if piece.color == color and piece.__class__.__name__ == 'King':
+            return piece
+      return None

@@ -19,8 +19,8 @@ class StatusDisplay:
         self.message_font_size = 18
         self.action_font_size = 16
         self.title_font = pygame.font.SysFont("Arial", self.title_font_size, bold=True)
-        self.message_font = pygame.font.SysFont("Segoe UI", self.message_font_size,bold=True)
-        self.action_font = pygame.font.SysFont("Segoe UI", self.action_font_size,bold=True)
+        self.message_font = pygame.font.SysFont("Segoe UI", self.message_font_size, bold=True)
+        self.action_font = pygame.font.SysFont("Segoe UI", self.action_font_size, bold=True)
         
         # Colors
         self.colors = {
@@ -47,15 +47,17 @@ class StatusDisplay:
         }
         
         self.current_message = ""
+        self.checking_piece = ""  # New attribute to store the checking piece info
         self.message_type = "normal"
         self.display_time = 2000
         self.message_start_time = 0
         self.should_display = False
 
-    def update_status(self, message, message_type="normal"):
+    def update_status(self, message, message_type="normal", checking_piece=None):
         if message != self.current_message or message_type == "check":
             self.current_message = message
             self.message_type = message_type
+            self.checking_piece = checking_piece  # Store checking piece info
             self.message_start_time = pygame.time.get_ticks()
             self.should_display = True
 
@@ -111,7 +113,7 @@ class StatusDisplay:
         
         # Message area
         message_box_height = status_rect.height - separator_y - (self.padding * 3)
-        if self.message_type == 'checkmate':
+        if self.message_type in ['checkmate', 'check']:
             # Reserve space for action text
             message_box_height -= self.action_font.get_linesize() * 2
         
@@ -124,18 +126,18 @@ class StatusDisplay:
         
         # Draw message
         message_height = self.draw_wrapped_text(
-    screen,
-    self.current_message,
-    self.message_font,
-    color_scheme['text'],
-    message_box_rect
-)
+            screen,
+            self.current_message,
+            self.message_font,
+            color_scheme['text'],
+            message_box_rect
+        )
         
-        # Add action text for checkmate with wrapping
+        # Add action text for checkmate and check with wrapping
         if self.message_type == 'checkmate':
             action_box_rect = pygame.Rect(
                 status_rect.left + self.padding,
-                message_box_rect.top+self.padding,
+                message_box_rect.top + self.padding,
                 status_rect.width - (self.padding * 2),
                 self.action_font.get_linesize() * 2
             )
@@ -143,6 +145,21 @@ class StatusDisplay:
             self.draw_wrapped_text(
                 screen,
                 "Go back to main menu to start a new game",
+                self.action_font,
+                color_scheme['text'],
+                action_box_rect
+            )
+        elif self.message_type == 'check' and self.checking_piece:
+            action_box_rect = pygame.Rect(
+                status_rect.left + self.padding,
+                message_box_rect.top + self.padding,
+                status_rect.width - (self.padding * 2),
+                self.action_font.get_linesize() * 2
+            )
+            
+            self.draw_wrapped_text(
+                screen,
+                f"King is being checked by {self.checking_piece}",
                 self.action_font,
                 color_scheme['text'],
                 action_box_rect
@@ -202,4 +219,5 @@ class StatusDisplay:
 
     def clear(self):
         self.current_message = ""
+        self.checking_piece = ""
         self.should_display = False
