@@ -3,9 +3,9 @@ import sys
 from chessboard import ChessBoard
 from game_rules import GameRules
 from sounds import SoundManager
-from start_menu import StartMenu
-from game_menu import GameMenu
-from status_display import StatusDisplay
+from ui.start_menu import StartMenu
+from ui.game_menu import GameMenu
+from ui.status_display import StatusDisplay
 from chess_ai import ChessAI
 
 def main():
