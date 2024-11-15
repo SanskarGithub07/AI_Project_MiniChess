@@ -1,1 +1,0 @@
-game_status_ui = GameStatusUI(screen_width, board_height)
