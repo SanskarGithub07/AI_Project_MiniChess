@@ -140,20 +140,20 @@ class ChessBoard:
             return True
         return False
     
-    # def is_empty_square(self, row, col):
-    #     """
-    #     Checks if a square at given row and col is empty.
-    #     Returns True if there is no piece at the square.
-    #     """
-    #     return self.get_piece_at((row, col)) is None
+    def is_empty_square(self, row, col):
+        """
+        Checks if a square at given row and col is empty.
+        Returns True if there is no piece at the square.
+        """
+        return self.get_piece_at((row, col)) is None
 
-    # def is_opponent_piece(self, row, col, current_color):
-    #     """
-    #     Checks if a piece at given coordinates belongs to the opponent.
-    #     Returns True if the piece color is opposite to current_color.
-    #     """
-    #     piece = self.get_piece_at((row, col))
-    #     return piece is not None and piece.color != current_color
+    def is_opponent_piece(self, row, col, current_color):
+        """
+        Checks if a piece at given coordinates belongs to the opponent.
+        Returns True if the piece color is opposite to current_color.
+        """
+        piece = self.get_piece_at((row, col))
+        return piece is not None and piece.color != current_color
     
     def draw_possible_moves(self, piece):
         """
