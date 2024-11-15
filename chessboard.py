@@ -179,3 +179,19 @@ class ChessBoard:
         tile_x = (position[0] - self.board_offset_x) // self.tile_size
         tile_y = (position[1] - self.board_offset_y) // self.tile_size
         return (tile_y, tile_x)
+
+    def create_piece(self, piece_type, color, position):
+        """
+        Create a piece dynamically based on its type.
+        """
+        piece_classes = {
+            'rook': Rook,
+            'knight': Knight,
+            'bishop': Bishop,
+            'queen': Queen,
+            'king': King,
+            'pawn': Pawn
+        }
+        piece_class = piece_classes[piece_type]
+        piece_image = self.get_piece_image(piece_type, color)
+        return piece_class(self.screen, piece_image, color, position)
