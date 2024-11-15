@@ -140,20 +140,20 @@ class ChessBoard:
             return True
         return False
     
-    def is_empty_square(self, row, col):
-        """
-        Checks if a square at given row and col is empty.
-        Returns True if there is no piece at the square.
-        """
-        return self.get_piece_at((row, col)) is None
+    # def is_empty_square(self, row, col):
+    #     """
+    #     Checks if a square at given row and col is empty.
+    #     Returns True if there is no piece at the square.
+    #     """
+    #     return self.get_piece_at((row, col)) is None
 
-    def is_opponent_piece(self, row, col, current_color):
-        """
-        Checks if a piece at given coordinates belongs to the opponent.
-        Returns True if the piece color is opposite to current_color.
-        """
-        piece = self.get_piece_at((row, col))
-        return piece is not None and piece.color != current_color
+    # def is_opponent_piece(self, row, col, current_color):
+    #     """
+    #     Checks if a piece at given coordinates belongs to the opponent.
+    #     Returns True if the piece color is opposite to current_color.
+    #     """
+    #     piece = self.get_piece_at((row, col))
+    #     return piece is not None and piece.color != current_color
     
     def draw_possible_moves(self, piece):
         """
@@ -179,3 +179,20 @@ class ChessBoard:
         tile_x = (position[0] - self.board_offset_x) // self.tile_size
         tile_y = (position[1] - self.board_offset_y) // self.tile_size
         return (tile_y, tile_x)
+    
+    def get_pieces_by_color(self, color):
+        """
+        Returns a list of pieces of a specific color.
+        color - color of the pieces ('white' or 'black')
+        """
+        return [piece for piece in self.pieces if piece.color == color]
+    
+    def find_king(self, color):
+        """
+        Finds and returns the king piece of a specific color.
+        color - color of the king ('white' or 'black')
+        """
+        for piece in self.pieces:
+            if isinstance(piece, King) and piece.color == color:
+                return piece
+        return None
