@@ -13,9 +13,9 @@ class StartMenu:
             'delete_save': pygame.Rect(screen_width//4, screen_height//4 + 200, screen_width//2, 50)
         }
         self.game_mode_buttons = {
-            'human_vs_human': pygame.Rect(screen_width//4, screen_height//4, screen_width//2, 50),
-            'human_vs_ai': pygame.Rect(screen_width//4, screen_height//4 + 100, screen_width//2, 50),
-            'ai_vs_ai': pygame.Rect(screen_width//4, screen_height//4 + 200, screen_width//2, 50),
+            'Human_vs_Human': pygame.Rect(screen_width//4, screen_height//4, screen_width//2, 50),
+            'Human_vs_AI': pygame.Rect(screen_width//4, screen_height//4 + 100, screen_width//2, 50),
+            'AI_vs_AI': pygame.Rect(screen_width//4, screen_height//4 + 200, screen_width//2, 50),
             'back': pygame.Rect(screen_width//4, screen_height//4 + 300, screen_width//2, 50)
         }
         self.show_game_modes = False
@@ -45,12 +45,12 @@ class StartMenu:
                         elif self.buttons['delete_save'].collidepoint(mouse_pos):
                             return 'delete_save'
                     else:
-                        if self.game_mode_buttons['human_vs_human'].collidepoint(mouse_pos):
-                            return 'human_vs_human'
-                        elif self.game_mode_buttons['human_vs_ai'].collidepoint(mouse_pos):
-                            return 'human_vs_ai'
-                        elif self.game_mode_buttons['ai_vs_ai'].collidepoint(mouse_pos):
-                            return 'ai_vs_ai'
+                        if self.game_mode_buttons['Human_vs_Human'].collidepoint(mouse_pos):
+                            return 'Human_vs_Human'
+                        elif self.game_mode_buttons['Human_vs_AI'].collidepoint(mouse_pos):
+                            return 'Human_vs_AI'
+                        elif self.game_mode_buttons['AI_vs_AI'].collidepoint(mouse_pos):
+                            return 'AI_vs_AI'
                         elif self.game_mode_buttons['back'].collidepoint(mouse_pos):
                             self.show_game_modes = False
 
