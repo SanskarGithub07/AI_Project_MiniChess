@@ -6,6 +6,7 @@ from sounds import SoundManager
 from start_menu import StartMenu
 from game_menu import GameMenu
 from status_display import StatusDisplay
+from chess_ai import ChessAI
 
 def main():
     pygame.init()
@@ -29,22 +30,25 @@ def main():
             run_game(screen, screen_width, board_height, sidebar_width, sound_manager)
         elif choice == 'human_vs_ai':
             # To be implemented
-            pass
+            run_game(screen, screen_width, board_height, sidebar_width, sound_manager, 'human_vs_ai')
         elif choice == 'ai_vs_ai':
             # To be implemented
-            pass
+            run_game(screen, screen_width, board_height, sidebar_width, sound_manager,'ai_vs_ai')
 
-def run_game(screen, screen_width, board_height, sidebar_width, sound_manager):
+def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, game_mode='human_vs_human'):
     board_width = screen_width - sidebar_width
     chess_board = ChessBoard(screen, board_width, board_height)
     game_rules = GameRules(chess_board)
     game_menu = GameMenu(screen_width, board_height, sidebar_width)
     clock = pygame.time.Clock()
     
+    # Initialize AI if needed
+    ai = None
+    if game_mode in ['human_vs_ai', 'ai_vs_ai']:
+        ai = ChessAI(chess_board, game_rules, depth=3)
+    
     running = True
     selected_piece = None
-    
-    # Initialize status display
     status_display = StatusDisplay(board_width, board_height, sidebar_width)
     
     def draw_turn_indicator():
@@ -90,11 +94,26 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager):
     while running:
         mouse_pos = pygame.mouse.get_pos()
         
+        # Handle AI moves
+        if ((game_mode == 'human_vs_ai' and game_rules.current_turn == 'black') or 
+            (game_mode == 'ai_vs_ai')):
+            
+            best_move = ai.get_best_move(game_rules.current_turn)
+            if best_move:
+                piece, new_position = best_move
+                if handle_move(piece, new_position):
+                    selected_piece = None
+                    # Add a small delay to make AI moves visible
+                    pygame.time.wait(500)
+                    continue
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             
             elif event.type == pygame.MOUSEBUTTONDOWN:
+                if game_mode == 'ai_vs_ai':
+                    continue
                 # Check if menu icon is clicked
                 menu_action = game_menu.handle_click(mouse_pos)
                 if menu_action:
