@@ -35,27 +35,72 @@ def main():
             # To be implemented
             run_game(screen, screen_width, board_height, sidebar_width, sound_manager,'AI_vs_AI')
 
+import threading
+import time
+
 def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, game_mode='Human_vs_Human'):
     board_width = screen_width - sidebar_width
     chess_board = ChessBoard(screen, board_width, board_height)
     game_rules = GameRules(chess_board)
     game_menu = GameMenu(screen_width, board_height, sidebar_width)
     clock = pygame.time.Clock()
-    
-    # Initialize AI if needed
-    ai = None
-    if game_mode in ['Human_vs_AI', 'AI_vs_AI']:
-        ai = ChessAI(chess_board, game_rules, depth=3)
-    
+
+    # Initialize AIs
+    ai_white = ChessAI(chess_board, game_rules, depth=3) if game_mode == 'AI_vs_AI' else None
+    ai_black = ChessAI(chess_board, game_rules, depth=3) if game_mode in ['Human_vs_AI', 'AI_vs_AI'] else None
+
+    # Synchronization variables
+    ai_move_results = {'white': None, 'black': None}
+    turn_lock = threading.Lock()
+    ai_move_ready = threading.Event()
+
+    def calculate_ai_move(ai, color):
+        """AI computation runs in a separate thread."""
+        best_move = ai.get_best_move(color)
+        with turn_lock:
+            ai_move_results[color] = best_move
+            ai_move_ready.set()  # Signal that the move is ready
+
     running = True
     selected_piece = None
     status_display = StatusDisplay(board_width, board_height, sidebar_width)
-    
+
     def draw_turn_indicator():
         sidebar_color = (0, 0, 0) if game_rules.current_turn == 'black' else (255, 255, 255)
         pygame.draw.rect(screen, sidebar_color, (board_width, 0, sidebar_width, board_height))
-    
+
     def update_game_status():
+     current_player = game_rules.current_turn
+     opponent = 'white' if current_player == 'black' else 'black'
+
+    # Check for game over first
+     game_over = game_rules.is_game_over()
+     if game_over:
+        if "Checkmate" in game_over:
+            status_display.update_status(game_over, "checkmate")
+            sound_manager.play_checkmate_sound()
+        elif "Stalemate" in game_over:
+            status_display.update_status(game_over, "stalemate")
+            sound_manager.play_move_sound()
+        return  # Exit early to avoid overriding game-over status
+
+    # Check for "Check" status
+     if game_rules.is_in_check(current_player):
+        checking_piece = None
+        opponent_pieces = chess_board.get_pieces_by_color(opponent)
+        king_position = chess_board.find_king(current_player).position
+
+        for piece in opponent_pieces:
+            if king_position in piece.get_possible_moves(chess_board):
+                checking_piece = f"{opponent.capitalize()}'s {piece.__class__.__name__}"
+                break
+
+        status_display.update_status(
+            f"{current_player.capitalize()} is in Check!",
+            "check",
+            checking_piece
+        )
+
      current_player = game_rules.current_turn
      opponent = 'white' if current_player == 'black' else 'black'
 
@@ -126,47 +171,87 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
         sound_manager.play_move_sound()
         return True
      return False
+     if game_rules.is_move_legal(selected_piece, final_position) and chess_board.move_piece(selected_piece, final_position):
+        current_player = game_rules.current_turn
+        opponent = 'white' if current_player == 'black' else 'black'
+
+        # Check if the game is over first
+        game_over = game_rules.is_game_over()
+        if game_over:
+            if "Checkmate" in game_over:
+                status_display.update_status(game_over, "checkmate")
+                sound_manager.play_checkmate_sound()
+            elif "Stalemate" in game_over:
+                status_display.update_status(game_over, "stalemate")
+                sound_manager.play_move_sound()
+            return True
+
+        # Check for "Check" status
+        if game_rules.is_in_check(current_player):
+            checking_piece = None
+            opponent_pieces = chess_board.get_pieces_by_color(opponent)
+            king_position = chess_board.find_king(current_player).position
+
+            for piece in opponent_pieces:
+                if king_position in piece.get_possible_moves(chess_board):
+                    checking_piece = f"{opponent.capitalize()}'s {piece.__class__.__name__}"
+                    break
+
+            status_display.update_status(
+                f"{current_player.capitalize()} is in Check!",
+                "check",
+                checking_piece
+            )
+            sound_manager.play_check_sound()
+
+        game_rules.switch_turn()
+        sound_manager.play_move_sound()
+        return True
+     return False
     
     while running:
         mouse_pos = pygame.mouse.get_pos()
-        
-        # Handle AI moves
-        if ((game_mode == 'Human_vs_AI' and game_rules.current_turn == 'black') or 
-            (game_mode == 'AI_vs_AI')):
-            
-            best_move = ai.get_best_move(game_rules.current_turn)
-            if best_move:
-                piece, new_position = best_move
-                if handle_move(piece, new_position):
-                    selected_piece = None
-                    # Add a small delay to make AI moves visible
-                    # pygame.time.wait(500)
-                    continue
-        
+
+        # Handle AI turns
+        current_turn = game_rules.current_turn
+        current_ai = ai_white if current_turn == 'white' else ai_black
+
+        if game_mode in ['Human_vs_AI', 'AI_vs_AI'] and current_ai:
+            if not ai_move_ready.is_set():
+                threading.Thread(target=calculate_ai_move, args=(current_ai, current_turn)).start()
+
+            # Wait for AI move
+            ai_move_ready.wait()
+            with turn_lock:
+                best_move = ai_move_results[current_turn]
+                if best_move:
+                    piece, new_position = best_move
+                    handle_move(piece, new_position)
+                    ai_move_ready.clear()
+                    # pygame.time.wait(500)  # Add delay for visibility
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            
+
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if game_mode == 'AI_vs_AI':
                     continue
-                # Check if menu icon is clicked
                 menu_action = game_menu.handle_click(mouse_pos)
                 if menu_action:
                     if menu_action == 'resume':
                         game_menu.menu_open = False
                     elif menu_action == 'save_game':
-                        # Implement save game functionality here
-                        pass
+                        pass  # Implement save functionality
                     elif menu_action == 'main_menu':
                         return
                     continue
-                
+
                 if not game_menu.menu_open:
                     position = pygame.mouse.get_pos()
                     tile_position = chess_board.handle_click(position)
                     piece = chess_board.get_piece_at(tile_position) if tile_position else None
-                    
+
                     if selected_piece is None:
                         if piece and piece.color == game_rules.current_turn:
                             selected_piece = piece
@@ -177,17 +262,17 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
                             selected_piece = piece
                         else:
                             selected_piece = None
-        
+
         # Clear screen for redraw
         screen.fill((255, 255, 255))
         chess_board.construct_board()
-        
+
         # Highlight selected piece and possible moves
         if selected_piece:
             x = chess_board.board_offset_x + selected_piece.position[1] * chess_board.tile_size
             y = chess_board.board_offset_y + selected_piece.position[0] * chess_board.tile_size
             pygame.draw.rect(screen, (255, 255, 0), (x, y, chess_board.tile_size, chess_board.tile_size), 3)
-            
+
             possible_moves = selected_piece.get_possible_moves(chess_board)
             for move in possible_moves:
                 move_x = chess_board.board_offset_x + move[1] * chess_board.tile_size
@@ -195,16 +280,16 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
                 highlight_surface = pygame.Surface((chess_board.tile_size, chess_board.tile_size), pygame.SRCALPHA)
                 pygame.draw.rect(highlight_surface, (0, 255, 0, 128), highlight_surface.get_rect())
                 screen.blit(highlight_surface, (move_x, move_y))
-        
+
         # Draw all pieces
         chess_board.draw_pieces()
-        
+
         # Draw UI elements
         draw_turn_indicator()
         update_game_status()
         status_display.draw(screen)
         game_menu.draw_menu(screen)
-        
+
         pygame.display.flip()
         clock.tick(60)
 
