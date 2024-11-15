@@ -104,7 +104,7 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
                 if handle_move(piece, new_position):
                     selected_piece = None
                     # Add a small delay to make AI moves visible
-                    pygame.time.wait(500)
+                    # pygame.time.wait(500)
                     continue
         
         for event in pygame.event.get():
