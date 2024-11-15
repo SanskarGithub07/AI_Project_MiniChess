@@ -26,9 +26,9 @@ def main():
         # Show start menu and get selected option
         choice = start_menu.run()
         
-        if choice == 'human_vs_human':
+        if choice == 'Human_vs_Human':
             run_game(screen, screen_width, board_height, sidebar_width, sound_manager)
-        elif choice == 'human_vs_ai':
+        elif choice == 'Human_vs_AI':
             # To be implemented
             run_game(screen, screen_width, board_height, sidebar_width, sound_manager, 'human_vs_ai')
         elif choice == 'ai_vs_ai':
