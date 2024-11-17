@@ -110,10 +110,15 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
     
     def handle_move(selected_piece, final_position):
         if game_rules.is_move_legal(selected_piece, final_position) and chess_board.move_piece(selected_piece, final_position):
+            captured_piece = chess_board.get_piece_at(final_position)
+
+            # Record the move
+            game_rules.record_move(selected_piece, selected_piece.position, final_position, captured_piece)
+
             if game_rules.is_in_check(game_rules.current_turn):
                 status_display.update_status(f"{game_rules.current_turn.capitalize()} is in Check!", "check")
                 sound_manager.play_check_sound()
-            
+
             game_over = game_rules.is_game_over()
             if game_over:
                 if "Checkmate" in game_over:
@@ -130,6 +135,7 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
             game_rules.switch_turn()
             return True
         return False
+
     
     while running:
         mouse_pos = pygame.mouse.get_pos()
@@ -212,6 +218,7 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
         # Draw UI elements
         draw_turn_indicator()
         update_game_status()
+        status_display.draw_move_history(screen, game_rules.move_history)
         status_display.draw(screen)
         game_menu.draw_menu(screen)
         

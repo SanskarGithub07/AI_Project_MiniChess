@@ -5,6 +5,8 @@ class StatusDisplay:
         self.board_width = board_width
         self.board_height = board_height
         self.sidebar_width = sidebar_width
+        self.font = pygame.font.Font(None, 24)  # Replace 24 with the desired font size
+
         
         # Status display configuration
         self.status_height = 140
@@ -51,6 +53,36 @@ class StatusDisplay:
         self.display_time = 2000
         self.message_start_time = 0
         self.should_display = False
+    
+    def draw_move_history(self, screen, move_history):
+        """
+        Displays the last 10 moves in the sidebar within a yellow text box.
+        """
+        # Define dimensions and position of the text box
+        box_width = self.sidebar_width - 20
+        box_height = 200  # Fixed height for move history box
+        x = self.board_width + 10  # Sidebar start
+        y = self.board_height - box_height - 20  # Position near the bottom
+
+        # Draw the yellow background rectangle
+        background_rect = pygame.Rect(x, y, box_width, box_height)
+        pygame.draw.rect(screen, (255, 255, 0), background_rect, border_radius=10)  # Yellow background
+        pygame.draw.rect(screen, (0, 0, 0), background_rect, 2, border_radius=10)  # Black border
+
+        # Render and display "Move History" header
+        header = self.font.render("Move History", True, (0, 0, 0))  # Black text for header
+        screen.blit(header, (x + 10, y + 10))  # Padding for the header
+        text_y = y + 40  # Start drawing moves below the header
+
+        # Render and display the moves
+        for move in move_history[-10:]:  # Show the last 10 moves
+            move_text = f"{move['color']} {move['piece']} {move['from']} to {move['to']}"
+            #if move['captured']:
+             #   move_text += f" (captured {move['captured']})"
+            text_surface = self.font.render(move_text, True, (0, 0, 0))  # Black text for moves
+            screen.blit(text_surface, (x + 10, text_y))  # Padding inside the box
+            text_y += 20  # Space between lines
+
 
     def update_status(self, message, message_type="normal"):
         if message != self.current_message or message_type == "check":
