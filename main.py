@@ -174,80 +174,53 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
 
     
     def handle_move(selected_piece, final_position):
-     if game_rules.is_move_legal(selected_piece, final_position) and chess_board.move_piece(selected_piece, final_position):
-        current_player = game_rules.current_turn
-        opponent = 'white' if current_player == 'black' else 'black'
+        if game_rules.is_move_legal(selected_piece, final_position) and chess_board.move_piece(selected_piece, final_position):
+            current_player = game_rules.current_turn
+            opponent = 'white' if current_player == 'black' else 'black'
 
-        # Check if the game is over first
-        game_over = game_rules.is_game_over()
-        if game_over:
-            if "Checkmate" in game_over:
-                status_display.update_status(game_over, "checkmate")
-                sound_manager.play_checkmate_sound()
-            elif "Stalemate" in game_over:
-                status_display.update_status(game_over, "stalemate")
-                sound_manager.play_move_sound()
-            return True
-
-        # Check for "Check" status
-        if game_rules.is_in_check(current_player):
-            checking_piece = None
-            opponent_pieces = chess_board.get_pieces_by_color(opponent)
-            king_position = chess_board.find_king(current_player).position
-
-            for piece in opponent_pieces:
-                if king_position in piece.get_possible_moves(chess_board):
-                    checking_piece = f"{opponent.capitalize()}'s {piece.__class__.__name__}"
-                    break
-
-            status_display.update_status(
-                f"{current_player.capitalize()} is in Check!",
-                "check",
-                checking_piece
+            # Record the move
+            captured_piece = chess_board.get_piece_at(final_position)
+            game_rules.record_move(
+                selected_piece,
+                selected_piece.position,
+                final_position,
+                captured_piece
             )
-            sound_manager.play_check_sound()
 
-        game_rules.switch_turn()
-        sound_manager.play_move_sound()
-        return True
-     return False
-     if game_rules.is_move_legal(selected_piece, final_position) and chess_board.move_piece(selected_piece, final_position):
-        current_player = game_rules.current_turn
-        opponent = 'white' if current_player == 'black' else 'black'
+            # Check if the game is over
+            game_over = game_rules.is_game_over()
+            if game_over:
+                if "Checkmate" in game_over:
+                    status_display.update_status(game_over, "checkmate")
+                    sound_manager.play_checkmate_sound()
+                elif "Stalemate" in game_over:
+                    status_display.update_status(game_over, "stalemate")
+                    sound_manager.play_move_sound()
+                return True
 
-        # Check if the game is over first
-        game_over = game_rules.is_game_over()
-        if game_over:
-            if "Checkmate" in game_over:
-                status_display.update_status(game_over, "checkmate")
-                sound_manager.play_checkmate_sound()
-            elif "Stalemate" in game_over:
-                status_display.update_status(game_over, "stalemate")
-                sound_manager.play_move_sound()
+            # Check for "Check" status
+            if game_rules.is_in_check(current_player):
+                checking_piece = None
+                opponent_pieces = chess_board.get_pieces_by_color(opponent)
+                king_position = chess_board.find_king(current_player).position
+
+                for piece in opponent_pieces:
+                    if king_position in piece.get_possible_moves(chess_board):
+                        checking_piece = f"{opponent.capitalize()}'s {piece.__class__.__name__}"
+                        break
+
+                status_display.update_status(
+                    f"{current_player.capitalize()} is in Check!",
+                    "check",
+                    checking_piece
+                )
+                sound_manager.play_check_sound()
+
+            game_rules.switch_turn()
+            sound_manager.play_move_sound()
             return True
+        return False
 
-        # Check for "Check" status
-        if game_rules.is_in_check(current_player):
-            checking_piece = None
-            opponent_pieces = chess_board.get_pieces_by_color(opponent)
-            king_position = chess_board.find_king(current_player).position
-
-            for piece in opponent_pieces:
-                if king_position in piece.get_possible_moves(chess_board):
-                    checking_piece = f"{opponent.capitalize()}'s {piece.__class__.__name__}"
-                    break
-
-            status_display.update_status(
-                f"{current_player.capitalize()} is in Check!",
-                "check",
-                checking_piece
-            )
-            sound_manager.play_check_sound()
-
-        game_rules.switch_turn()
-        sound_manager.play_move_sound()
-        return True
-     return False
     
     while running:
         mouse_pos = pygame.mouse.get_pos()
