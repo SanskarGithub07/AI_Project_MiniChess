@@ -4,6 +4,7 @@ class GameRules:
     def __init__(self, board):
         self.board = board
         self.current_turn = 'white'
+        self.move_history = []
 
     def switch_turn(self):
         self.current_turn = 'black' if self.current_turn == 'white' else 'white'
@@ -87,3 +88,19 @@ class GameRules:
         elif self.is_stalemate(self.current_turn):
             return "Stalemate! It's a draw."
         return None
+    
+    def position_to_notation(self, pos):
+        column = chr(pos[1] + ord('a'))  # 'a' to 'h'
+        row = str(8 - pos[0])  # '1' to '8'
+        return f"{column}{row}"
+    
+    def record_move(self, piece, from_pos, to_pos, captured_piece=None):
+        move = {
+            'piece': piece.type,
+            'color': piece.color,
+            'from': self.position_to_notation(from_pos),
+            'to': self.position_to_notation(to_pos),
+            'captured': captured_piece.type if captured_piece else None
+        }
+        self.move_history.append(move)
+

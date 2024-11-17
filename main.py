@@ -334,6 +334,7 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
         # Draw UI elements
         draw_turn_indicator()
         update_game_status()
+        status_display.draw_move_history(screen, game_rules.move_history)
         status_display.draw(screen)
         game_menu.draw_menu(screen)
 
