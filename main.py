@@ -7,6 +7,46 @@ from ui.start_menu import StartMenu
 from ui.game_menu import GameMenu
 from ui.status_display import StatusDisplay
 from chess_ai import ChessAI
+import pickle
+
+def save_game(chess_board, game_rules, game_mode, file_name="saved_game.pkl"):
+    """
+    Save the current game state to a file.
+    """
+    with open(file_name, 'wb') as file:
+        game_state = {
+            'board': [(p.type, p.color, p.position) for p in chess_board.pieces],
+            'current_turn': game_rules.current_turn,
+            'game_mode': game_mode  # Include game mode
+        }
+        pickle.dump(game_state, file)
+
+
+def load_game(chess_board, game_rules, current_game_mode, file_name="saved_game.pkl"):
+    """
+    Load a saved game state from a file.
+    """
+    try:
+        with open(file_name, 'rb') as file:
+            game_state = pickle.load(file)
+            
+            # Check if the game mode matches
+            saved_game_mode = game_state.get('game_mode', 'human_vs_human')  # Default if missing
+            if saved_game_mode != current_game_mode:
+                print(f"Error: Cannot load a {saved_game_mode} game in {current_game_mode} mode.")
+                return False  # Indicate loading failure
+
+            # Load the game state
+            chess_board.pieces = [
+                chess_board.create_piece(piece_type, color, position)
+                for piece_type, color, position in game_state['board']
+            ]
+            game_rules.current_turn = game_state['current_turn']
+            return True  # Indicate loading success
+    except FileNotFoundError:
+        print("No saved game found!")
+        return False  # Indicate loading failure
+
 
 def main():
     pygame.init()
@@ -27,7 +67,7 @@ def main():
         choice = start_menu.run()
         
         if choice == 'Human_vs_Human':
-            run_game(screen, screen_width, board_height, sidebar_width, sound_manager)
+            run_game(screen, screen_width, board_height, sidebar_width, sound_manager, 'human_vs_human')
         elif choice == 'Human_vs_AI':
             # To be implemented
             run_game(screen, screen_width, board_height, sidebar_width, sound_manager, 'Human_vs_AI')
@@ -242,7 +282,14 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
                     if menu_action == 'resume':
                         game_menu.menu_open = False
                     elif menu_action == 'save_game':
-                        pass  # Implement save functionality
+                        save_game(chess_board, game_rules, game_mode)
+                        print("Game saved successfully!")  # Debug message or feedback
+                    elif menu_action == 'load_game':
+                        success = load_game(chess_board, game_rules, game_mode)
+                        if success:
+                            print("Game loaded successfully!")
+                        else:
+                            print("Failed to load game!")
                     elif menu_action == 'main_menu':
                         return
                     continue

@@ -196,3 +196,19 @@ class ChessBoard:
             if isinstance(piece, King) and piece.color == color:
                 return piece
         return None
+
+    def create_piece(self, piece_type, color, position):
+        """
+        Create a piece dynamically based on its type.
+        """
+        piece_classes = {
+            'rook': Rook,
+            'knight': Knight,
+            'bishop': Bishop,
+            'queen': Queen,
+            'king': King,
+            'pawn': Pawn
+        }
+        piece_class = piece_classes[piece_type]
+        piece_image = self.get_piece_image(piece_type, color)
+        return piece_class(self.screen, piece_image, color, position)

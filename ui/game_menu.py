@@ -15,10 +15,12 @@ class GameMenu:
         
         self.menu_open = False
         self.buttons = {
-            'resume': pygame.Rect(screen_width//4, screen_height//4, screen_width//2, 50),
-            'save_game': pygame.Rect(screen_width//4, screen_height//4 + 100, screen_width//2, 50),
-            'main_menu': pygame.Rect(screen_width//4, screen_height//4 + 200, screen_width//2, 50)
+        'resume': pygame.Rect(screen_width // 4, screen_height // 4, screen_width // 2, 50),
+        'save_game': pygame.Rect(screen_width // 4, screen_height // 4 + 100, screen_width // 2, 50),
+        'load_game': pygame.Rect(screen_width // 4, screen_height // 4 + 200, screen_width // 2, 50),
+        'main_menu': pygame.Rect(screen_width // 4, screen_height // 4 + 300, screen_width // 2, 50)
         }
+
 
     def draw_menu_icon(self, screen):
         # Draw rounded rectangle background
