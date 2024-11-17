@@ -69,10 +69,8 @@ def main():
         if choice == 'Human_vs_Human':
             run_game(screen, screen_width, board_height, sidebar_width, sound_manager, 'human_vs_human')
         elif choice == 'Human_vs_AI':
-            # To be implemented
             run_game(screen, screen_width, board_height, sidebar_width, sound_manager, 'Human_vs_AI')
         elif choice == 'AI_vs_AI':
-            # To be implemented
             run_game(screen, screen_width, board_height, sidebar_width, sound_manager,'AI_vs_AI')
 
 import threading
@@ -225,29 +223,28 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
     #             sound_manager.play_move_sound()
     #         return True
 
-            # Check for "Check" status
-            if game_rules.is_in_check(current_player):
-                checking_piece = None
-                opponent_pieces = chess_board.get_pieces_by_color(opponent)
-                king_position = chess_board.find_king(current_player).position
+    #     # Check for "Check" status
+    #     if game_rules.is_in_check(current_player):
+    #         checking_piece = None
+    #         opponent_pieces = chess_board.get_pieces_by_color(opponent)
+    #         king_position = chess_board.find_king(current_player).position
 
-                for piece in opponent_pieces:
-                    if king_position in piece.get_possible_moves(chess_board):
-                        checking_piece = f"{opponent.capitalize()}'s {piece.__class__.__name__}"
-                        break
+    #         for piece in opponent_pieces:
+    #             if king_position in piece.get_possible_moves(chess_board):
+    #                 checking_piece = f"{opponent.capitalize()}'s {piece.__class__.__name__}"
+    #                 break
 
-                status_display.update_status(
-                    f"{current_player.capitalize()} is in Check!",
-                    "check",
-                    checking_piece
-                )
-                sound_manager.play_check_sound()
+    #         status_display.update_status(
+    #             f"{current_player.capitalize()} is in Check!",
+    #             "check",
+    #             checking_piece
+    #         )
+    #         sound_manager.play_check_sound()
 
-            game_rules.switch_turn()
-            sound_manager.play_move_sound()
-            return True
-        return False
-
+    #     game_rules.switch_turn()
+    #     sound_manager.play_move_sound()
+    #     return True
+    #  return False
     
     while running:
         mouse_pos = pygame.mouse.get_pos()
