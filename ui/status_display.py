@@ -14,7 +14,7 @@ class StatusDisplay:
         
         # Position in middle of sidebar
         self.x_position = board_width + self.padding
-        self.y_position = (board_height // 2) - (self.status_height // 2)
+        self.y_position = (board_height // 2) - (self.status_height // 2) - 50
         
         # Font setup
         self.title_font_size = 22
@@ -59,11 +59,12 @@ class StatusDisplay:
         """
         Displays the last 10 moves in the sidebar within a yellow text box.
         """
-        # Define dimensions and position of the text box
+        # Calculate box height for 10 lines of text + header
+        line_height = 20  # Approximate height for each line of text
+        box_height = 10 * line_height + 50  # 10 lines + padding for header and spacing
         box_width = self.sidebar_width - 20
-        box_height = 200  # Fixed height for move history box
-        x = self.board_width + 10  # Sidebar start
-        y = self.board_height - box_height - 20  # Position near the bottom
+        x = self.board_width + 10
+        y = self.board_height - box_height - 20  # Adjust based on new height
 
         # Draw the yellow background rectangle
         background_rect = pygame.Rect(x, y, box_width, box_height)
@@ -77,12 +78,13 @@ class StatusDisplay:
 
         # Render and display the moves
         for move in move_history[-10:]:  # Show the last 10 moves
-            move_text = f"{move['color']} {move['piece']} {move['from']} to {move['to']}"
+            move_text = f"{move['color']} {move['piece']} {move['from']}"
             #if move['captured']:
-             #   move_text += f" (captured {move['captured']})"
+            #    move_text += f" (captured {move['captured']})"
             text_surface = self.font.render(move_text, True, (0, 0, 0))  # Black text for moves
             screen.blit(text_surface, (x + 10, text_y))  # Padding inside the box
-            text_y += 20  # Space between lines
+            text_y += line_height  # Space between lines
+
 
 
     def update_status(self, message, message_type="normal", checking_piece=None):

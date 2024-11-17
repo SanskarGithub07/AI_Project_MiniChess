@@ -155,22 +155,6 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
             sound_manager.play_move_sound()
         return  # Exit early to avoid overriding game-over status
 
-    # Check for "Check" status
-     if game_rules.is_in_check(current_player):
-        checking_piece = None
-        opponent_pieces = chess_board.get_pieces_by_color(opponent)
-        king_position = chess_board.find_king(current_player).position
-
-        for piece in opponent_pieces:
-            if king_position in piece.get_possible_moves(chess_board):
-                checking_piece = f"{opponent.capitalize()}'s {piece.__class__.__name__}"
-                break
-
-        status_display.update_status(
-            f"{current_player.capitalize()} is in Check!",
-            "check",
-            checking_piece
-        )
 
     
     def handle_move(selected_piece, final_position):
