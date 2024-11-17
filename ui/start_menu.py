@@ -7,16 +7,16 @@ class StartMenu:
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.font = pygame.font.Font(None, 36)
+        # Only keep new_game button
         self.buttons = {
-            'new_game': pygame.Rect(screen_width//4, screen_height//4, screen_width//2, 50),
-            'load_game': pygame.Rect(screen_width//4, screen_height//4 + 100, screen_width//2, 50),
-            'delete_save': pygame.Rect(screen_width//4, screen_height//4 + 200, screen_width//2, 50)
+            'new_game': pygame.Rect(screen_width//4, screen_height//3, screen_width//2, 50)
         }
+        # Adjust game mode buttons spacing
         self.game_mode_buttons = {
             'Human_vs_Human': pygame.Rect(screen_width//4, screen_height//4, screen_width//2, 50),
-            'Human_vs_AI': pygame.Rect(screen_width//4, screen_height//4 + 100, screen_width//2, 50),
-            'AI_vs_AI': pygame.Rect(screen_width//4, screen_height//4 + 200, screen_width//2, 50),
-            'back': pygame.Rect(screen_width//4, screen_height//4 + 300, screen_width//2, 50)
+            'Human_vs_AI': pygame.Rect(screen_width//4, screen_height//4 + 80, screen_width//2, 50),
+            'AI_vs_AI': pygame.Rect(screen_width//4, screen_height//4 + 160, screen_width//2, 50),
+            'back': pygame.Rect(screen_width//4, screen_height//4 + 240, screen_width//2, 50)
         }
         self.show_game_modes = False
 
@@ -40,10 +40,6 @@ class StartMenu:
                     if not self.show_game_modes:
                         if self.buttons['new_game'].collidepoint(mouse_pos):
                             self.show_game_modes = True
-                        elif self.buttons['load_game'].collidepoint(mouse_pos):
-                            return 'load_game'
-                        elif self.buttons['delete_save'].collidepoint(mouse_pos):
-                            return 'delete_save'
                     else:
                         if self.game_mode_buttons['Human_vs_Human'].collidepoint(mouse_pos):
                             return 'Human_vs_Human'
