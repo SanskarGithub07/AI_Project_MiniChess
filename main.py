@@ -103,25 +103,33 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
     selected_piece = None
     status_display = StatusDisplay(board_width, board_height, sidebar_width)
 
+    # Flags to track sound play status
+    check_sound_played = False
+    checkmate_sound_played = False
+    stalemate_sound_played = False
+
     def draw_turn_indicator():
         sidebar_color = (0, 0, 0) if game_rules.current_turn == 'black' else (255, 255, 255)
         pygame.draw.rect(screen, sidebar_color, (board_width, 0, sidebar_width, board_height))
 
     def update_game_status():
+        nonlocal check_sound_played, checkmate_sound_played, stalemate_sound_played
         current_player = game_rules.current_turn
         opponent = 'white' if current_player == 'black' else 'black'
 
         game_over = game_rules.is_game_over()
         if game_over:
-            if "Checkmate" in game_over:
+            if "Checkmate" in game_over and not checkmate_sound_played:
                 status_display.update_status(game_over, "checkmate")
                 sound_manager.play_checkmate_sound()
-            elif "Stalemate" in game_over:
+                checkmate_sound_played = True
+            elif "Stalemate" in game_over and not stalemate_sound_played:
                 status_display.update_status(game_over, "stalemate")
-                sound_manager.play_move_sound()
+                sound_manager.play_stalemate_sound()
+                stalemate_sound_played = True
             return
 
-        if game_rules.is_in_check(current_player):
+        if game_rules.is_in_check(current_player) and not check_sound_played:
             checking_piece = None
             opponent_pieces = chess_board.get_pieces_by_color(opponent)
             king_position = chess_board.find_king(current_player).position
@@ -136,8 +144,11 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
                 "check",
                 checking_piece
             )
+            sound_manager.play_check_sound()
+            check_sound_played = True
 
     def handle_move(selected_piece, final_position):
+        nonlocal check_sound_played, checkmate_sound_played, stalemate_sound_played
         if game_rules.is_move_legal(selected_piece, final_position) and chess_board.move_piece(selected_piece, final_position):
             current_player = game_rules.current_turn
             opponent = 'white' if current_player == 'black' else 'black'
@@ -152,15 +163,17 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
 
             game_over = game_rules.is_game_over()
             if game_over:
-                if "Checkmate" in game_over:
+                if "Checkmate" in game_over and not checkmate_sound_played:
                     status_display.update_status(game_over, "checkmate")
                     sound_manager.play_checkmate_sound()
-                elif "Stalemate" in game_over:
+                    checkmate_sound_played = True
+                elif "Stalemate" in game_over and not stalemate_sound_played:
                     status_display.update_status(game_over, "stalemate")
-                    sound_manager.play_move_sound()
+                    sound_manager.play_stalemate_sound()
+                    stalemate_sound_played = True
                 return True
 
-            if game_rules.is_in_check(current_player):
+            if game_rules.is_in_check(current_player) and not check_sound_played:
                 checking_piece = None
                 opponent_pieces = chess_board.get_pieces_by_color(opponent)
                 king_position = chess_board.find_king(current_player).position
@@ -176,9 +189,15 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
                     checking_piece
                 )
                 sound_manager.play_check_sound()
+                check_sound_played = True
+            else:
+                check_sound_played = False
 
             game_rules.switch_turn()
             sound_manager.play_move_sound()
+            check_sound_played = False
+            checkmate_sound_played = False
+            stalemate_sound_played = False
             return True
         return False
 
@@ -241,10 +260,8 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
                     else:
                         if handle_move(selected_piece, tile_position):
                             selected_piece = None
-                        elif piece and piece.color == game_rules.current_turn:
-                            selected_piece = piece
                         else:
-                            selected_piece = None
+                            selected_piece = piece if piece and piece.color == game_rules.current_turn else None
 
         # Clear screen for redraw
         screen.fill((255, 255, 255))
