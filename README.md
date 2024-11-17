@@ -23,8 +23,6 @@ python main3.py
 
 ## Project Structure
 
-## Project Structure
-
 ### Main Game Files
 - `main.py`: The main script that runs the game loop and handles events. Implements point-and-click chess gameplay with AI support.
 - `main2.py`: Old backup implementation of the main game with drag-and-drop functionality.
