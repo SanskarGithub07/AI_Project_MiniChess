@@ -69,10 +69,8 @@ def main():
         if choice == 'Human_vs_Human':
             run_game(screen, screen_width, board_height, sidebar_width, sound_manager, 'human_vs_human')
         elif choice == 'Human_vs_AI':
-            # To be implemented
             run_game(screen, screen_width, board_height, sidebar_width, sound_manager, 'Human_vs_AI')
         elif choice == 'AI_vs_AI':
-            # To be implemented
             run_game(screen, screen_width, board_height, sidebar_width, sound_manager,'AI_vs_AI')
 
 import threading
