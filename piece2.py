@@ -4,14 +4,6 @@ import pygame
 class Piece:
     
     def __init__(self, screen, image, color, position):
-        """
-        Initializes a chess piece with essential attributes:
-        screen - surface on which the piece will be drawn
-        image - visual representation of the piece
-        color - piece color ('white' or 'black')
-        position - tuple for piece's current board coordinates (row, col)
-        type - type of piece (e.g., 'pawn', 'rook', 'knight')
-        """
         self.screen = screen
         self.image = image
         self.color = color
@@ -19,21 +11,11 @@ class Piece:
         self.type = self.__class__.__name__.lower()
 
     def draw(self, tile_size, board_offset_x, board_offset_y):
-        """
-        Draws the piece on the screen at its current position.
-        tile_size - size of each square on the board
-        board_offset_x, board_offset_y - pixel offset for the board's top-left corner
-        """
         x = board_offset_x + self.position[1] * tile_size
         y = board_offset_y + self.position[0] * tile_size
         self.screen.blit(self.image, (x, y))
     
     def move(self, new_position, board):
-        """
-        Moves the piece to a new position if the move is valid.
-        new_position - tuple for target coordinates (row, col)
-        board - current game board instance
-        """
         if self.is_valid_move(new_position, board):
             target_piece = board.get_piece_at(new_position)
             if target_piece:

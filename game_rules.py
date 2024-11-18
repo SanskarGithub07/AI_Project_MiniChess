@@ -49,7 +49,7 @@ class GameRules:
             possible_moves = piece.get_possible_moves(self.board)
             for move in possible_moves:
                 if self.is_move_legal(piece, move):
-                    return False  # If any legal move exists, it's not checkmate
+                    return False 
         return True
 
     def is_stalemate(self, color):
@@ -61,7 +61,7 @@ class GameRules:
             possible_moves = piece.get_possible_moves(self.board)
             for move in possible_moves:
                 if self.is_move_legal(piece, move):
-                    return False  # If any legal move exists, it's not stalemate
+                    return False 
         return True
 
     def is_game_over(self):
