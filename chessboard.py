@@ -1,7 +1,6 @@
 import pygame
 from piece2 import Rook, Knight, Bishop, Queen, King, Pawn
 
-#class to represent the chessboard and managing its pieces
 class ChessBoard:
     def __init__(self, screen, width, height):
      
@@ -49,7 +48,8 @@ class ChessBoard:
         return pieces
 
     def get_piece_image(self, piece_name, color):
-        row = 0 if color == 'black' else 1
+        row = 0 if color == 'white' else 1
+        # changed black to white for correct invertion.
         col = {
             'king': 1,
             'queen': 0,
