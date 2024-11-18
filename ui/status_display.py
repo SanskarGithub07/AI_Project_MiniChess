@@ -67,7 +67,7 @@ class StatusDisplay:
         self.current_message = ""
         self.checking_piece = ""  
         self.message_type = "normal"
-        self.display_time = 2000
+        self.display_time = 4000
         self.message_start_time = 0
         self.should_display = False
         
@@ -140,7 +140,7 @@ class StatusDisplay:
     
     def draw_move_history(self, screen, move_history):
         line_height = 20  
-        box_height = 10 * line_height + 50  
+        box_height = 10 * line_height + 20  
         box_width = self.sidebar_width - 20
         x = self.board_width + 10
         y = self.board_height - box_height - 20  
@@ -189,7 +189,7 @@ class StatusDisplay:
             self.x_position,
             self.y_position,
             self.sidebar_width - (self.padding * 2),
-            self.status_height
+            self.status_height + 20
         )
 
         color_scheme = self.colors[self.message_type]
@@ -204,9 +204,9 @@ class StatusDisplay:
         title_surface = self.title_font.render(title_text, True, color_scheme['text'])
         title_rect = title_surface.get_rect(
             centerx=status_rect.centerx,
-            top=status_rect.top + self.padding
+            top=status_rect.top
         )
-        screen.blit(title_surface, title_rect)
+        # screen.blit(title_surface, title_rect) #this is just the check message
 
         separator_y = title_rect.bottom + 5
         pygame.draw.line(
@@ -217,15 +217,17 @@ class StatusDisplay:
             1
         )
 
+        # reduces height for check/checkmate to make room for action text
         message_box_height = status_rect.height - separator_y - (self.padding * 3)
         if self.message_type in ['checkmate', 'check']:
             message_box_height -= self.action_font.get_linesize() * 2
 
         message_box_rect = pygame.Rect(
             status_rect.left + self.padding * 2,
-            separator_y + 10,
+            # status_rect.top + separator_y + self.padding,
+            separator_y + self.padding * 10,
             status_rect.width - (self.padding * 4),
-            message_box_height
+            message_box_height - 11 * self.padding
         )
 
         message_height = self.draw_wrapped_text(
@@ -235,6 +237,8 @@ class StatusDisplay:
             color_scheme['text'],
             message_box_rect
         )
+
+        # the above line is where the _colour_ is in check message is shown, way above where it should be
 
         if self.message_type == 'checkmate':
             action_box_rect = pygame.Rect(
@@ -256,7 +260,7 @@ class StatusDisplay:
                 status_rect.left + self.padding,
                 message_box_rect.top + self.padding,
                 status_rect.width - (self.padding * 2),
-                self.action_font.get_linesize() * 2
+                self.action_font.get_linesize() - 100
             )
 
             self.draw_wrapped_text(
