@@ -5,7 +5,7 @@ class StatusDisplay:
         self.board_width = board_width
         self.board_height = board_height
         self.sidebar_width = sidebar_width
-        self.stats_sidebar_width = sidebar_width + 100
+        self.stats_sidebar_width = sidebar_width
         self.font = pygame.font.Font(None, 24)  # Replace 24 with the desired font size
 
         
@@ -22,8 +22,10 @@ class StatusDisplay:
             'positions_per_second': 0
         }
         self.ai_stats_height = 160
-        self.ai_stats_x_position = self.x_position - sidebar_width + self.padding  # Shift stats to the right
-        self.ai_stats_y_position = self.y_position + self.status_height - 200
+        # self.ai_stats_x_position = self.x_position - sidebar_width + self.padding  # Shift stats to the right
+        self.ai_stats_x_position = self.x_position
+        # self.ai_stats_y_position = self.y_position + self.status_height - 200
+        self.ai_stats_y_position = 0
         
         self.title_font_size = 22
         self.message_font_size = 18
@@ -70,7 +72,6 @@ class StatusDisplay:
         self.should_display = False
         
     def update_ai_stats(self, depth, positions_evaluated, evaluation_time):
-        """Update AI statistics"""
         self.ai_stats['depth'] = depth
         self.ai_stats['positions_evaluated'] = positions_evaluated
         self.ai_stats['evaluation_time'] = evaluation_time
@@ -80,26 +81,22 @@ class StatusDisplay:
             self.ai_stats['positions_per_second'] = 0
 
     def draw_ai_stats(self, screen):
-        """Draw AI statistics sidebar"""
         stats_rect = pygame.Rect(
             self.ai_stats_x_position,
             self.ai_stats_y_position,
-            self.stats_sidebar_width - (self.padding * 2),
+            self.stats_sidebar_width - self.padding * 2,
             self.ai_stats_height
         )
         
         color_scheme = self.colors['stats']
         
-        # Draw shadow
         shadow_rect = stats_rect.copy()
         shadow_rect.move_ip(2, 2)
         pygame.draw.rect(screen, (0, 0, 0, 30), shadow_rect, border_radius=10)
         
-        # Draw main box
         pygame.draw.rect(screen, color_scheme['bg'], stats_rect, border_radius=10)
         pygame.draw.rect(screen, color_scheme['border'], stats_rect, 2, border_radius=10)
         
-        # Draw title
         title_surface = self.title_font.render("AI Statistics", True, color_scheme['text'])
         title_rect = title_surface.get_rect(
             centerx=stats_rect.centerx,
@@ -122,10 +119,10 @@ class StatusDisplay:
         line_height = self.stats_font.get_linesize() + 5
         
         stats_items = [
-            ("Search Depth", f"{self.ai_stats['depth']} ply"),
+            ("Search Depth", f"{self.ai_stats['depth']}"),
             ("Positions", f"{self.ai_stats['positions_evaluated']:,}"),
             ("Time", f"{self.ai_stats['evaluation_time']:.2f} sec"),
-            ("Positions/sec", f"{self.ai_stats['positions_per_second']:,}/s")
+            ("Positions/sec", f"{self.ai_stats['positions_per_second']:,}")
         ]
         
         for i, (label, value) in enumerate(stats_items):
@@ -176,10 +173,7 @@ class StatusDisplay:
             self.should_display = True
 
     def draw(self, screen):
-        # Always draw AI stats
         self.draw_ai_stats(screen)
-        
-        # Only display the status message when it should be shown
         if not self.should_display or not self.current_message:
             return
 
