@@ -6,7 +6,6 @@ class ChessAI:
         self.game_rules = game_rules
         self.depth = depth
         
-        # Piece values for evaluation
         self.piece_values = {
             'pawn': 100,
             'knight': 320,
@@ -16,7 +15,6 @@ class ChessAI:
             'king': 20000
         }
         
-        # Position evaluation tables
         self.pawn_table = [
             [0,  0,  0,  0,  0,  0,  0,  0],
             [50, 50, 50, 50, 50, 50, 50, 50],
@@ -90,21 +88,18 @@ class ChessAI:
         alpha = float('-inf')
         beta = float('inf')
         
-        # Get all pieces of the current color
         pieces = [p for p in self.board.pieces if p.color == color]
         
         for piece in pieces:
             possible_moves = piece.get_possible_moves(self.board)
             for move in possible_moves:
                 if self.game_rules.is_move_legal(piece, move):
-                    # Make move
                     old_pos = piece.position
                     captured_piece = self.board.get_piece_at(move)
                     if captured_piece:
                         self.board.pieces.remove(captured_piece)
                     piece.position = move
                     
-                    # Evaluate position
                     if color == 'white':
                         value = self.minimax(self.depth - 1, alpha, beta, False)
                         if value > best_value:
@@ -118,7 +113,6 @@ class ChessAI:
                             best_move = (piece, move)
                         beta = min(beta, value)
                     
-                    # Undo move
                     piece.position = old_pos
                     if captured_piece:
                         self.board.pieces.append(captured_piece)
@@ -129,7 +123,6 @@ class ChessAI:
         return best_move
 
     def minimax(self, depth, alpha, beta, maximizing_player):
-        """Minimax algorithm with alpha-beta pruning."""
         if depth == 0 or self.game_rules.is_game_over():
             return self.evaluate_position()
         
@@ -141,7 +134,6 @@ class ChessAI:
                 possible_moves = piece.get_possible_moves(self.board)
                 for move in possible_moves:
                     if self.game_rules.is_move_legal(piece, move):
-                        # Make move
                         old_pos = piece.position
                         captured_piece = self.board.get_piece_at(move)
                         if captured_piece:
@@ -152,7 +144,6 @@ class ChessAI:
                         max_eval = max(max_eval, eval)
                         alpha = max(alpha, eval)
                         
-                        # Undo move
                         piece.position = old_pos
                         if captured_piece:
                             self.board.pieces.append(captured_piece)
@@ -169,7 +160,6 @@ class ChessAI:
                 possible_moves = piece.get_possible_moves(self.board)
                 for move in possible_moves:
                     if self.game_rules.is_move_legal(piece, move):
-                        # Make move
                         old_pos = piece.position
                         captured_piece = self.board.get_piece_at(move)
                         if captured_piece:
@@ -180,7 +170,6 @@ class ChessAI:
                         min_eval = min(min_eval, eval)
                         beta = min(beta, eval)
                         
-                        # Undo move
                         piece.position = old_pos
                         if captured_piece:
                             self.board.pieces.append(captured_piece)
@@ -191,7 +180,6 @@ class ChessAI:
             return min_eval
 
     def evaluate_position(self):
-        """Evaluates the current board position."""
         total_eval = 0
         
         for piece in self.board.pieces:
@@ -206,7 +194,6 @@ class ChessAI:
         return total_eval
     
     def get_position_value(self, piece):
-        """Gets the positional value for a piece based on its location."""
         row, col = piece.position
         if piece.color == 'black':
             row = 7 - row  # Flip the table for black pieces

@@ -8,7 +8,6 @@ class GameMenu:
         self.sidebar_width = sidebar_width
         self.font = pygame.font.Font(None, 36)
         
-        # Center the menu icon in the sidebar
         icon_size = 30
         icon_x = screen_width - (sidebar_width / 2) - (icon_size / 2)
         self.menu_icon = pygame.Rect(icon_x, 10, icon_size, icon_size)
@@ -23,10 +22,8 @@ class GameMenu:
 
 
     def draw_menu_icon(self, screen):
-        # Draw rounded rectangle background
         pygame.draw.rect(screen, (70, 70, 70), self.menu_icon, border_radius=5)
         
-        # Draw three lines to make a menu icon
         for i in range(3):
             pygame.draw.line(screen, (255, 255, 255),
                            (self.menu_icon.left + 5, self.menu_icon.top + 7 + i * 8),
@@ -35,7 +32,6 @@ class GameMenu:
 
     def draw_menu(self, screen):
         if self.menu_open:
-            # Semi-transparent overlay
             overlay = pygame.Surface((self.screen_width, self.screen_height))
             overlay.fill((0, 0, 0))
             overlay.set_alpha(128)

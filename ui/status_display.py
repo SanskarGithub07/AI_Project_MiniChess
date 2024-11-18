@@ -8,15 +8,12 @@ class StatusDisplay:
         self.font = pygame.font.Font(None, 24)  # Replace 24 with the desired font size
 
         
-        # Status display configuration
         self.status_height = 140
         self.padding = 10
         
-        # Position in middle of sidebar
         self.x_position = board_width + self.padding
         self.y_position = (board_height // 2) - (self.status_height // 2) - 50
         
-        # Font setup
         self.title_font_size = 22
         self.message_font_size = 18
         self.action_font_size = 16
@@ -24,7 +21,6 @@ class StatusDisplay:
         self.message_font = pygame.font.SysFont("Segoe UI", self.message_font_size, bold=True)
         self.action_font = pygame.font.SysFont("Segoe UI", self.action_font_size, bold=True)
         
-        # Colors
         self.colors = {
             'normal': {
                 'bg': (248, 250, 252),
@@ -49,41 +45,34 @@ class StatusDisplay:
         }
         
         self.current_message = ""
-        self.checking_piece = ""  # New attribute to store the checking piece info
+        self.checking_piece = ""  
         self.message_type = "normal"
         self.display_time = 2000
         self.message_start_time = 0
         self.should_display = False
     
     def draw_move_history(self, screen, move_history):
-        """
-        Displays the last 10 moves in the sidebar within a yellow text box.
-        """
-        # Calculate box height for 10 lines of text + header
-        line_height = 20  # Approximate height for each line of text
-        box_height = 10 * line_height + 50  # 10 lines + padding for header and spacing
+        line_height = 20  
+        box_height = 10 * line_height + 50  
         box_width = self.sidebar_width - 20
         x = self.board_width + 10
-        y = self.board_height - box_height - 20  # Adjust based on new height
+        y = self.board_height - box_height - 20  
 
-        # Draw the yellow background rectangle
         background_rect = pygame.Rect(x, y, box_width, box_height)
-        pygame.draw.rect(screen, (255, 255, 0), background_rect, border_radius=10)  # Yellow background
-        pygame.draw.rect(screen, (0, 0, 0), background_rect, 2, border_radius=10)  # Black border
+        pygame.draw.rect(screen, (255, 255, 0), background_rect, border_radius=10)  
+        pygame.draw.rect(screen, (0, 0, 0), background_rect, 2, border_radius=10)  
 
-        # Render and display "Move History" header
-        header = self.font.render("Move History", True, (0, 0, 0))  # Black text for header
-        screen.blit(header, (x + 10, y + 10))  # Padding for the header
-        text_y = y + 40  # Start drawing moves below the header
+        header = self.font.render("Move History", True, (0, 0, 0))  
+        screen.blit(header, (x + 10, y + 10))  
+        text_y = y + 40  
 
-        # Render and display the moves
-        for move in move_history[-10:]:  # Show the last 10 moves
+        for move in move_history[-10:]:  
             move_text = f"{move['color']} {move['piece']} {move['from']}"
             #if move['captured']:
             #    move_text += f" (captured {move['captured']})"
-            text_surface = self.font.render(move_text, True, (0, 0, 0))  # Black text for moves
-            screen.blit(text_surface, (x + 10, text_y))  # Padding inside the box
-            text_y += line_height  # Space between lines
+            text_surface = self.font.render(move_text, True, (0, 0, 0))  
+            screen.blit(text_surface, (x + 10, text_y))  
+            text_y += line_height  
 
 
 
@@ -91,7 +80,7 @@ class StatusDisplay:
         if message != self.current_message or message_type == "check":
             self.current_message = message
             self.message_type = message_type
-            self.checking_piece = checking_piece  # Store checking piece info
+            self.checking_piece = checking_piece  
             self.message_start_time = pygame.time.get_ticks()
             self.should_display = True
 
@@ -107,7 +96,6 @@ class StatusDisplay:
             self.current_message = ""
             return
         
-        # Create status box
         status_rect = pygame.Rect(
             self.x_position,
             self.y_position,
@@ -116,17 +104,13 @@ class StatusDisplay:
         )
         
         color_scheme = self.colors[self.message_type]
-        
-        # Draw shadow
         shadow_rect = status_rect.copy()
         shadow_rect.move_ip(2, 2)
         pygame.draw.rect(screen, (0, 0, 0, 30), shadow_rect, border_radius=10)
         
-        # Draw main background with rounded corners
         pygame.draw.rect(screen, color_scheme['bg'], status_rect, border_radius=10)
         pygame.draw.rect(screen, color_scheme['border'], status_rect, 2, border_radius=10)
         
-        # Draw title
         title_text = self.get_title_text()
         title_surface = self.title_font.render(title_text, True, color_scheme['text'])
         title_rect = title_surface.get_rect(
@@ -135,7 +119,6 @@ class StatusDisplay:
         )
         screen.blit(title_surface, title_rect)
         
-        # Draw separator
         separator_y = title_rect.bottom + 5
         pygame.draw.line(
             screen,
@@ -145,10 +128,8 @@ class StatusDisplay:
             1
         )
         
-        # Message area
         message_box_height = status_rect.height - separator_y - (self.padding * 3)
         if self.message_type in ['checkmate', 'check']:
-            # Reserve space for action text
             message_box_height -= self.action_font.get_linesize() * 2
         
         message_box_rect = pygame.Rect(
@@ -158,7 +139,6 @@ class StatusDisplay:
             message_box_height
         )
         
-        # Draw message
         message_height = self.draw_wrapped_text(
             screen,
             self.current_message,
@@ -167,7 +147,6 @@ class StatusDisplay:
             message_box_rect
         )
         
-        # Add action text for checkmate and check with wrapping
         if self.message_type == 'checkmate':
             action_box_rect = pygame.Rect(
                 status_rect.left + self.padding,
@@ -209,38 +188,30 @@ class StatusDisplay:
         return titles.get(self.message_type, 'Game Status')
 
     def draw_wrapped_text(self, surface, text, font, color, rect):
-        """Improved word wrapping function with better spacing control."""
         words = text.split()
         lines = []
         current_line = []
         
-        # Calculate maximum width considering padding
         max_width = rect.width - self.padding * 2
         
         for word in words:
-            # Try adding the word to the current line
             test_line = ' '.join(current_line + [word])
             test_surface = font.render(test_line, True, color)
             
             if test_surface.get_width() <= max_width:
                 current_line.append(word)
             else:
-                # If current line has content, add it to lines
                 if current_line:
                     lines.append(' '.join(current_line))
-                # Start new line with current word
                 current_line = [word]
         
-        # Add the last line if it has content
         if current_line:
             lines.append(' '.join(current_line))
         
-        # Calculate total height needed for all lines
-        line_spacing = 1.2  # Slightly increased line spacing
+        line_spacing = 1.2  
         total_height = len(lines) * (font.get_linesize() * line_spacing)
-        current_y = rect.top + (rect.height - total_height) // 2  # Center vertically
+        current_y = rect.top + (rect.height - total_height) // 2 
         
-        # Draw each line
         for line in lines:
             text_surface = font.render(line, True, color)
             text_rect = text_surface.get_rect(

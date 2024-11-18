@@ -50,31 +50,19 @@ class Piece:
 
     ## Only for the pawn -> queen change
     def check_promotion(self, new_position, board):
-        """
-        Checks if the pawn has reached the end of the board for promotion.
-        Only applies to pawns, which are promoted to a queen.
-        """
         if (self.color == 'white' and new_position[0] == 7) or \
         (self.color == 'black' and new_position[0] == 0):
             self.promote(board)
     
     def is_valid_move(self, new_position, board):
-        """
-        Validates the move by checking if it’s in the piece's possible moves.
-        """
         if new_position not in self.get_possible_moves(board):
             return False
         return True
     
     def get_possible_moves(self, board):
-        """
-        Returns a list of possible moves for the piece based on its type.
-        Uses movement patterns for each piece type to calculate valid moves.
-        """
         possible_moves = []
         current_row, current_col = self.position
 
-        # Define the movement patterns for different piece types
         movement_patterns = {
             'rook': [(-1, 0), (1, 0), (0, -1), (0, 1)],
             'knight': [(-2, 1), (-1, 2), (1, 2), (2, 1), (2, -1), (1, -2), (-1, -2), (-2, -1)],
@@ -90,10 +78,6 @@ class Piece:
         return possible_moves
     
     def get_moves_in_direction(self, board, row, col, direction):
-        """
-        Generates moves in a specific direction (used for rooks, bishops, queens).
-        Stops if blocked by another piece or after a capture.
-        """
         moves = []
         row_increase, col_increase = direction
         new_row, new_col = row + row_increase, col + col_increase
@@ -105,12 +89,11 @@ class Piece:
                     if board.is_opponent_piece(new_row, new_col, self.color):
                         break  # Stop checking after capturing
                 else:
-                    break  # Stop checking if blocked by a friendly piece
+                    break  # blocked by friendly piece
 
                 new_row += row_increase
                 new_col += col_increase
         else:
-            # For knight and king, directly add move if valid
             if 0 <= new_row < 8 and 0 <= new_col < 8:
                 if board.is_empty_square(new_row, new_col) or board.is_opponent_piece(new_row, new_col, self.color):
                     moves.append((new_row, new_col))
@@ -139,10 +122,6 @@ class Pawn(Piece):
         self.direction = 1 if color == 'white' else -1
             
     def get_possible_moves(self, board):
-        """
-        Overrides get_possible_moves for pawn-specific movement rules.
-        Pawns can move forward, and capture diagonally.
-        """
         possible_moves = []
         current_row, current_col = self.position
         new_row = current_row + self.direction
@@ -151,7 +130,6 @@ class Pawn(Piece):
             if not board.get_piece_at((new_row, current_col)):
                 possible_moves.append((new_row, current_col))
                 
-                ## En passant by checking if the pawn has moved once using boolean flag
                 if not self.moved_once:
                     second_row_ahead =  current_row + (2 * self.direction)               
                     if (0 <= second_row_ahead < 8 and not board.get_piece_at((second_row_ahead, current_col))):
@@ -172,9 +150,6 @@ class Pawn(Piece):
         return possible_moves
     
     def promote(self, board):
-        """
-        Promotes a pawn to a queen upon reaching the farthest row.
-        """
         board.pieces.remove(self)
         
         queen_image = board.get_piece_image('queen', self.color)
