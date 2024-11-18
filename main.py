@@ -73,7 +73,7 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
     clock = pygame.time.Clock()
     popup = None
 
-    ai_white = ChessAI(chess_board, game_rules, depth=3) if game_mode == 'AI_vs_AI' else None
+    ai_white = ChessAI(chess_board, game_rules, depth=4) if game_mode == 'AI_vs_AI' else None
     ai_black = ChessAI(chess_board, game_rules, depth=3) if game_mode in ['Human_vs_AI', 'AI_vs_AI'] else None
 
     ai_move_results = {'white': None, 'black': None}
@@ -217,7 +217,7 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
         mouse_pos = pygame.mouse.get_pos()
 
         current_turn = game_rules.current_turn
-        current_ai = ai_white if current_turn == 'white' else ai_black
+        current_ai = ai_black if current_turn == 'white' else ai_white
 
         if game_mode in ['Human_vs_AI', 'AI_vs_AI'] and current_ai:
             if not ai_move_ready.is_set():

@@ -66,7 +66,7 @@ class GameRules:
 
     def is_game_over(self):
         if self.is_checkmate(self.current_turn):
-            return f"Checkmate! {self.current_turn} loses."
+            return f"Checkmate! {self.current_turn} wins."
         elif self.is_stalemate(self.current_turn):
             return "Stalemate! It's a draw."
         return None
