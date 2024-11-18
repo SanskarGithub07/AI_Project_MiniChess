@@ -1,4 +1,5 @@
 from piece2 import King, Queen, Rook, Bishop, Knight, Pawn
+import time
 
 class ChessAI:
     def __init__(self, board, game_rules, depth=3):
@@ -83,6 +84,9 @@ class ChessAI:
 
     def get_best_move(self, color):
         """Returns the best move for the given color using minimax with alpha-beta pruning."""
+        self.positions_evaluated = 0  # Reset counter
+        start_time = time.time()  # Start timing
+        
         best_value = float('-inf') if color == 'white' else float('inf')
         best_move = None
         alpha = float('-inf')
@@ -94,6 +98,7 @@ class ChessAI:
             possible_moves = piece.get_possible_moves(self.board)
             for move in possible_moves:
                 if self.game_rules.is_move_legal(piece, move):
+                    self.positions_evaluated += 1  # Increment counter
                     old_pos = piece.position
                     captured_piece = self.board.get_piece_at(move)
                     if captured_piece:
@@ -119,6 +124,16 @@ class ChessAI:
                     
                     if alpha >= beta:
                         break
+        
+        evaluation_time = time.time() - start_time  # Calculate time taken
+    
+        # Update status display with AI statistics
+        if hasattr(self, 'status_display'):
+            self.status_display.update_ai_stats(
+                self.depth,
+                self.positions_evaluated,
+                evaluation_time
+            )
         
         return best_move
 

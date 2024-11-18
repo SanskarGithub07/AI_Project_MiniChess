@@ -89,6 +89,10 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
     running = True
     selected_piece = None
     status_display = StatusDisplay(board_width, board_height, sidebar_width)
+    if ai_white:
+        ai_white.status_display = status_display
+    if ai_black:
+        ai_black.status_display = status_display
 
     check_sound_played = False
     checkmate_sound_played = False
