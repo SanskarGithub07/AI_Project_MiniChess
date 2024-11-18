@@ -80,7 +80,7 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
         game_over = game_rules.is_game_over()
         if game_over:
             if "Checkmate" in game_over and not checkmate_sound_played:
-                status_display.update_status(game_over, "checkmate")
+                status_display.update_status(game_over, "checkmate", current_turn=current_player)
                 sound_manager.play_checkmate_sound()
                 checkmate_sound_played = True
             elif "Stalemate" in game_over and not stalemate_sound_played:
@@ -136,7 +136,7 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
             game_over = game_rules.is_game_over()
             if game_over:
                 if "Checkmate" in game_over and not checkmate_sound_played:
-                    status_display.update_status(game_over, "checkmate")
+                    status_display.update_status(game_over, "checkmate", current_turn=current_player)
                     sound_manager.play_checkmate_sound()
                     checkmate_sound_played = True
                 elif "Stalemate" in game_over and not stalemate_sound_played:
@@ -170,7 +170,8 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
                 status_display.update_status(
                     f"{tempplayer.capitalize()} is in Check!",
                     "check",
-                    checking_piece
+                    checking_piece,
+                    current_turn=current_player
                 )
                 sound_manager.play_check_sound()
                 check_sound_played = True

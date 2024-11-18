@@ -1,4 +1,5 @@
 import pygame
+from game_rules import GameRules as gr
 
 class StatusDisplay:
     def __init__(self, board_width, board_height, sidebar_width):
@@ -66,6 +67,7 @@ class StatusDisplay:
         
         self.current_message = ""
         self.checking_piece = ""  
+        self.current_turn = ""
         self.message_type = "normal"
         self.display_time = 4000
         self.message_start_time = 0
@@ -163,7 +165,7 @@ class StatusDisplay:
 
 
 
-    def update_status(self, message, message_type="normal", checking_piece=None):
+    def update_status(self, message, message_type="normal", checking_piece=None, current_turn=None):
         if message != self.current_message or message_type == "check":
             self.current_message = message
             self.message_type = message_type
@@ -171,6 +173,7 @@ class StatusDisplay:
             self.checking_piece = checking_piece  
             self.message_start_time = pygame.time.get_ticks()
             self.should_display = True
+            self.current_turn = current_turn
 
     def draw(self, screen):
         self.draw_ai_stats(screen)
@@ -238,24 +241,52 @@ class StatusDisplay:
             message_box_rect
         )
 
-        # the above line is where the _colour_ is in check message is shown, way above where it should be
+        # the above line is where the _colour_ is in check + checkmate, _colour_ wins message is shown, way above where it should be
 
         if self.message_type == 'checkmate':
+
+            # pygame.draw.line(
+            # screen,
+            # color_scheme['border'],
+            # (status_rect.left + self.padding, separator_y + 20),
+            # (status_rect.right - self.padding, separator_y + 20),
+            # 1
+            # )
+            
             action_box_rect = pygame.Rect(
                 status_rect.left + self.padding,
                 message_box_rect.top + self.padding,
                 status_rect.width - (self.padding * 2),
-                self.action_font.get_linesize() * 2
+                self.action_font.get_linesize() - 100
             )
+
+            # self.draw_wrapped_text(
+            #     screen,
+            #     "Go back to main menu to start a new game",
+            #     self.action_font,
+            #     color_scheme['text'],
+            #     action_box_rect
+            # )
 
             self.draw_wrapped_text(
                 screen,
-                "Go back to main menu to start a new game",
+                f"{self.current_turn.capitalize()} wins! Go back to main menu to start a new game",
                 self.action_font,
                 color_scheme['text'],
                 action_box_rect
             )
+
+            
+
         elif self.message_type == 'check' and self.checking_piece:
+            # pygame.draw.line(
+            # screen,
+            # color_scheme['border'],
+            # (status_rect.left + self.padding, separator_y),
+            # (status_rect.right - self.padding, separator_y),
+            # 1
+            # )
+
             action_box_rect = pygame.Rect(
                 status_rect.left + self.padding,
                 message_box_rect.top + self.padding,
