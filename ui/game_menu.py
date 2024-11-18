@@ -9,7 +9,8 @@ class GameMenu:
         self.font = pygame.font.Font(None, 36)
         
         icon_size = 30
-        icon_x = screen_width - (sidebar_width / 2) - (icon_size / 2)
+        # icon_x = screen_width - (sidebar_width / 2) - (icon_size / 2)
+        icon_x = screen_width - (sidebar_width) + 20
         self.menu_icon = pygame.Rect(icon_x, 10, icon_size, icon_size)
         
         self.menu_open = False

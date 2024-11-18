@@ -8,7 +8,7 @@ class Popup:
         self.start_time = None
         self.font = pygame.font.SysFont("Arial", 20)
         
-        self.width = 200
+        self.width = 400
         self.height = 50
         self.x = (screen.get_width() - self.width) // 2
         self.y = screen.get_height() - self.height - 20

@@ -12,43 +12,11 @@ import pickle
 import threading
 import time
 
-def save_game(chess_board, game_rules, game_mode, file_name="saved_game.pkl"):
-    try:
-        with open(file_name, 'wb') as file:
-            game_state = {
-                'board': [(p.type, p.color, p.position) for p in chess_board.pieces],
-                'current_turn': game_rules.current_turn,
-                'game_mode': game_mode
-            }
-            pickle.dump(game_state, file)
-        return True
-    except:
-        return False
-
-def load_game(chess_board, game_rules, current_game_mode, file_name="saved_game.pkl"):
-    try:
-        with open(file_name, 'rb') as file:
-            game_state = pickle.load(file)
-            
-            saved_game_mode = game_state.get('game_mode', 'human_vs_human')  
-            if saved_game_mode != current_game_mode:
-                return False  
-
-            chess_board.pieces = [
-                chess_board.create_piece(piece_type, color, position)
-                for piece_type, color, position in game_state['board']
-            ]
-            game_rules.current_turn = game_state['current_turn']
-            return True
-    except FileNotFoundError:
-        return False
-
 def main():
     pygame.init()
     sound_manager = SoundManager()
-
     board_width, board_height = 600, 600
-    sidebar_width = 200
+    sidebar_width = 250
     screen_width = board_width + sidebar_width
     screen = pygame.display.set_mode((screen_width, board_height))
     pygame.display.set_caption('Chess Board')
@@ -89,6 +57,10 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
     running = True
     selected_piece = None
     status_display = StatusDisplay(board_width, board_height, sidebar_width)
+    if ai_white:
+        ai_white.status_display = status_display
+    if ai_black:
+        ai_black.status_display = status_display
 
     check_sound_played = False
     checkmate_sound_played = False
@@ -108,7 +80,7 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
         game_over = game_rules.is_game_over()
         if game_over:
             if "Checkmate" in game_over and not checkmate_sound_played:
-                status_display.update_status(game_over, "checkmate")
+                status_display.update_status(game_over, "checkmate", current_turn=current_player)
                 sound_manager.play_checkmate_sound()
                 checkmate_sound_played = True
             elif "Stalemate" in game_over and not stalemate_sound_played:
@@ -164,7 +136,7 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
             game_over = game_rules.is_game_over()
             if game_over:
                 if "Checkmate" in game_over and not checkmate_sound_played:
-                    status_display.update_status(game_over, "checkmate")
+                    status_display.update_status(game_over, "checkmate", current_turn=current_player)
                     sound_manager.play_checkmate_sound()
                     checkmate_sound_played = True
                 elif "Stalemate" in game_over and not stalemate_sound_played:
@@ -198,7 +170,8 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
                 status_display.update_status(
                     f"{tempplayer.capitalize()} is in Check!",
                     "check",
-                    checking_piece
+                    checking_piece,
+                    current_turn=current_player
                 )
                 sound_manager.play_check_sound()
                 check_sound_played = True
@@ -304,6 +277,38 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
 
         pygame.display.flip()
         clock.tick(60)
+
+def save_game(chess_board, game_rules, game_mode, file_name="saved_game.pkl"):
+    try:
+        with open(file_name, 'wb') as file:
+            game_state = {
+                'board': [(p.type, p.color, p.position) for p in chess_board.pieces],
+                'current_turn': game_rules.current_turn,
+                'game_mode': game_mode
+            }
+            pickle.dump(game_state, file)
+        return True
+    except:
+        return False
+
+def load_game(chess_board, game_rules, current_game_mode, file_name="saved_game.pkl"):
+    try:
+        with open(file_name, 'rb') as file:
+            game_state = pickle.load(file)
+            
+            saved_game_mode = game_state.get('game_mode', 'human_vs_human')  
+            if saved_game_mode != current_game_mode:
+                return False  
+
+            chess_board.pieces = [
+                chess_board.create_piece(piece_type, color, position)
+                for piece_type, color, position in game_state['board']
+            ]
+            game_rules.current_turn = game_state['current_turn']
+            return True
+    except FileNotFoundError:
+        return False
+    
 
 if __name__ == "__main__":
     main()
