@@ -7,11 +7,9 @@ class StartMenu:
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.font = pygame.font.Font(None, 36)
-        # Only keep new_game button
         self.buttons = {
             'new_game': pygame.Rect(screen_width//4, screen_height//3, screen_width//2, 50)
         }
-        # Adjust game mode buttons spacing
         self.game_mode_buttons = {
             'Human_vs_Human': pygame.Rect(screen_width//4, screen_height//4, screen_width//2, 50),
             'Human_vs_AI': pygame.Rect(screen_width//4, screen_height//4 + 80, screen_width//2, 50),

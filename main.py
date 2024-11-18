@@ -13,9 +13,6 @@ import threading
 import time
 
 def save_game(chess_board, game_rules, game_mode, file_name="saved_game.pkl"):
-    """
-    Save the current game state to a file.
-    """
     try:
         with open(file_name, 'wb') as file:
             game_state = {
@@ -29,19 +26,14 @@ def save_game(chess_board, game_rules, game_mode, file_name="saved_game.pkl"):
         return False
 
 def load_game(chess_board, game_rules, current_game_mode, file_name="saved_game.pkl"):
-    """
-    Load a saved game state from a file.
-    """
     try:
         with open(file_name, 'rb') as file:
             game_state = pickle.load(file)
             
-            # Check if the game mode matches
             saved_game_mode = game_state.get('game_mode', 'human_vs_human')  
             if saved_game_mode != current_game_mode:
                 return False  
 
-            # Load the game state
             chess_board.pieces = [
                 chess_board.create_piece(piece_type, color, position)
                 for piece_type, color, position in game_state['board']
@@ -54,15 +46,13 @@ def load_game(chess_board, game_rules, current_game_mode, file_name="saved_game.
 def main():
     pygame.init()
     sound_manager = SoundManager()
-    
-    # Screen setup
+
     board_width, board_height = 600, 600
     sidebar_width = 200
     screen_width = board_width + sidebar_width
     screen = pygame.display.set_mode((screen_width, board_height))
     pygame.display.set_caption('Chess Board')
     
-    # Initialize start menu
     start_menu = StartMenu(screen_width, board_height)
     
     while True:
@@ -83,17 +73,14 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
     clock = pygame.time.Clock()
     popup = None
 
-    # Initialize AIs
     ai_white = ChessAI(chess_board, game_rules, depth=3) if game_mode == 'AI_vs_AI' else None
     ai_black = ChessAI(chess_board, game_rules, depth=3) if game_mode in ['Human_vs_AI', 'AI_vs_AI'] else None
 
-    # Synchronization variables
     ai_move_results = {'white': None, 'black': None}
     turn_lock = threading.Lock()
     ai_move_ready = threading.Event()
 
     def calculate_ai_move(ai, color):
-        """AI computation runs in a separate thread."""
         best_move = ai.get_best_move(color)
         with turn_lock:
             ai_move_results[color] = best_move
@@ -103,7 +90,6 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
     selected_piece = None
     status_display = StatusDisplay(board_width, board_height, sidebar_width)
 
-    # Flags to track sound play status
     check_sound_played = False
     checkmate_sound_played = False
     stalemate_sound_played = False
@@ -204,7 +190,6 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
     while running:
         mouse_pos = pygame.mouse.get_pos()
 
-        # Handle AI turns
         current_turn = game_rules.current_turn
         current_ai = ai_white if current_turn == 'white' else ai_black
 
@@ -263,11 +248,9 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
                         else:
                             selected_piece = piece if piece and piece.color == game_rules.current_turn else None
 
-        # Clear screen for redraw
         screen.fill((255, 255, 255))
         chess_board.construct_board()
 
-        # Highlight selected piece and possible moves
         if selected_piece:
             x = chess_board.board_offset_x + selected_piece.position[1] * chess_board.tile_size
             y = chess_board.board_offset_y + selected_piece.position[0] * chess_board.tile_size
@@ -281,17 +264,14 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
                 pygame.draw.rect(highlight_surface, (0, 255, 0, 128), highlight_surface.get_rect())
                 screen.blit(highlight_surface, (move_x, move_y))
 
-        # Draw all pieces
         chess_board.draw_pieces()
 
-        # Draw UI elements
         draw_turn_indicator()
         update_game_status()
         status_display.draw_move_history(screen, game_rules.move_history)
         status_display.draw(screen)
         game_menu.draw_menu(screen)
 
-        # Draw popup if active
         if popup:
             if not popup.draw():
                 popup = None
