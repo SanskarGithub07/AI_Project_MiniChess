@@ -3,7 +3,8 @@ from piece2 import King
 class GameRules:
     def __init__(self, board):
         self.board = board
-        self.current_turn = 'white'
+        self.current_turn = 'black'
+        #invert colours
         self.move_history = []
 
     def switch_turn(self):
@@ -76,9 +77,13 @@ class GameRules:
         return f"{column}{row}"
     
     def record_move(self, piece, from_pos, to_pos, captured_piece=None):
+        if (piece.color == 'white'):
+            tempcolor = 'black'
+        else:
+            tempcolor = 'white'
         move = {
             'piece': piece.type,
-            'color': piece.color,
+            'color': tempcolor, # replace with piece.color for original
             'from': self.position_to_notation(from_pos),
             'to': self.position_to_notation(to_pos),
             'captured': captured_piece.type if captured_piece else None

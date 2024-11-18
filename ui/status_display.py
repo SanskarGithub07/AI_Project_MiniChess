@@ -80,6 +80,7 @@ class StatusDisplay:
         if message != self.current_message or message_type == "check":
             self.current_message = message
             self.message_type = message_type
+            
             self.checking_piece = checking_piece  
             self.message_start_time = pygame.time.get_ticks()
             self.should_display = True

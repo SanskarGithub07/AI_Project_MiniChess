@@ -95,13 +95,15 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
     stalemate_sound_played = False
 
     def draw_turn_indicator():
-        sidebar_color = (0, 0, 0) if game_rules.current_turn == 'black' else (255, 255, 255)
+        sidebar_color = (0, 0, 0) if game_rules.current_turn == 'white' else (255, 255, 255)
+        # changed black to white in above for current turn colour.
         pygame.draw.rect(screen, sidebar_color, (board_width, 0, sidebar_width, board_height))
 
     def update_game_status():
         nonlocal check_sound_played, checkmate_sound_played, stalemate_sound_played
         current_player = game_rules.current_turn
-        opponent = 'white' if current_player == 'black' else 'black'
+        opponent = 'black' if current_player == 'white' else 'white'
+        # swapped black with white and vice versa, invert colours here to go back.
 
         game_over = game_rules.is_game_over()
         if game_over:
@@ -122,11 +124,22 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
 
             for piece in opponent_pieces:
                 if king_position in piece.get_possible_moves(chess_board):
-                    checking_piece = f"{opponent.capitalize()}'s {piece.__class__.__name__}"
+                    # remove the tempcolor as it currently inverts as required
+                    if (opponent == 'black'):
+                        tempcolor2 = 'white'
+                    else:
+                        tempcolor2 = 'black'
+                    checking_piece = f"{tempcolor2.capitalize()}'s {piece.__class__.__name__}"
                     break
 
+            if (current_player == 'black'):
+                tempplayer = 'white'
+            else:
+                tempplayer = 'black'
+            # remove tempplayer with current_player
+
             status_display.update_status(
-                f"{current_player.capitalize()} is in Check!",
+                f"{tempplayer.capitalize()} is in Check!",
                 "check",
                 checking_piece
             )
@@ -137,7 +150,8 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
         nonlocal check_sound_played, checkmate_sound_played, stalemate_sound_played
         if game_rules.is_move_legal(selected_piece, final_position) and chess_board.move_piece(selected_piece, final_position):
             current_player = game_rules.current_turn
-            opponent = 'white' if current_player == 'black' else 'black'
+            opponent = 'black' if current_player == 'white' else 'white'
+            # swapped black with white and vice versa, invert colours here to go back.
 
             captured_piece = chess_board.get_piece_at(final_position)
             game_rules.record_move(
@@ -166,11 +180,23 @@ def run_game(screen, screen_width, board_height, sidebar_width, sound_manager, g
 
                 for piece in opponent_pieces:
                     if king_position in piece.get_possible_moves(chess_board):
-                        checking_piece = f"{opponent.capitalize()}'s {piece.__class__.__name__}"
-                        break
 
+                        # remove the tempcolor as it currently inverts as required
+                        if (opponent == 'black'):
+                            tempcolor2 = 'white'
+                        else:
+                            tempcolor2 = 'black'
+                        checking_piece = f"{tempcolor2.capitalize()}'s {piece.__class__.__name__}"
+                        break
+                
+                if (current_player == 'black'):
+                    tempplayer = 'white'
+                else:
+                    tempplayer = 'black'
+
+                # remove tempplayer with current_player
                 status_display.update_status(
-                    f"{current_player.capitalize()} is in Check!",
+                    f"{tempplayer.capitalize()} is in Check!",
                     "check",
                     checking_piece
                 )

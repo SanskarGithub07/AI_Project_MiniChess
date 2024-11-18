@@ -82,7 +82,6 @@ class ChessAI:
         ]
 
     def get_best_move(self, color):
-        """Returns the best move for the given color using minimax with alpha-beta pruning."""
         best_value = float('-inf') if color == 'white' else float('inf')
         best_move = None
         alpha = float('-inf')
