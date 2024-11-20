@@ -153,12 +153,12 @@ class StatusDisplay:
 
         header = self.font.render("Move History", True, (0, 0, 0))  
         screen.blit(header, (x + 10, y + 10))  
+        max_moves = 9
+        visible_moves = move_history[-max_moves:] 
         text_y = y + 40  
 
-        for move in move_history[-10:]:  
+        for move in visible_moves:  
             move_text = f"{move['color']} {move['piece']} {move['from']}"
-            #if move['captured']:
-            #    move_text += f" (captured {move['captured']})"
             text_surface = self.font.render(move_text, True, (0, 0, 0))  
             screen.blit(text_surface, (x + 10, text_y))  
             text_y += line_height  
